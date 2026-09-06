@@ -3,66 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 – 2027 Desktop Calendar Planner with Notes</title>
+  <title>2026 – 2027 Calendar Planner</title>
   <style>
-    :root {
-      --bg-primary: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --border-color: #cbd5e1;
-      
-      --bg-govt: #fee2e2;
-      --color-govt: #dc2626;
-      --bg-jntuh: #dcfce7;
-      --color-jntuh: #16a34a;
-      --bg-optional: #ffedd5;
-      --color-optional: #ea580c;
-      --bg-festival: #dbeafe;
-      --color-festival: #2563eb;
-      --bg-sunday: #fff1f2;
-      --color-sunday: #be123c;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
     body {
-      background-color: var(--bg-primary);
-      color: var(--text-main);
-      padding: 8px;
+      background-color: #ffffff;
+      color: #111827;
+      padding: 16px;
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* Minimal Filter Control Bar */
+    /* Top Control Bar */
     .filter-bar {
       display: flex;
       align-items: center;
       gap: 16px;
-      background: #0f172a;
+      background: #1e293b;
       color: #fff;
-      padding: 6px 14px;
-      border-radius: 8px;
-      margin-bottom: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
       flex-shrink: 0;
     }
 
-    .filter-group { display: flex; align-items: center; gap: 6px; }
-    .filter-label { font-size: 0.85rem; font-weight: 700; color: #fbbf24; }
+    .filter-group { display: flex; align-items: center; gap: 8px; }
+    .filter-label { font-size: 0.88rem; font-weight: 700; color: #facc15; }
     
     select {
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
       color: #0f172a;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
     }
 
-    /* Zero Vertical Scroll Main Layout */
+    /* Main Calendar Container */
     .calendar-container {
       flex-grow: 1;
       display: flex;
@@ -71,10 +53,6 @@
     }
 
     .month-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      padding: 6px;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -84,144 +62,111 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 4px;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 4px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
       flex-shrink: 0;
     }
     
-    .month-title { font-size: 1.1rem; font-weight: 800; color: #1e3a8a; }
-    .samvatsara-info { font-size: 0.72rem; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+    .month-title { font-size: 1.25rem; font-weight: 800; color: #0f172a; }
+    .samvatsara-info { font-size: 0.78rem; background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 6px; font-weight: 700; }
 
     /* Calendar Grid */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: auto repeat(6, 1fr);
-      gap: 5px;
+      grid-template-rows: auto repeat(5, 1fr);
+      gap: 8px;
       flex-grow: 1;
       height: 100%;
     }
 
-    .grid-header {
-      background: #0f172a;
-      color: #fff;
+    /* Grey Header Pills matching screenshot */
+    .day-header {
+      background: #f1f5f9;
+      color: #1e293b;
       text-align: center;
-      padding: 4px;
-      font-size: 0.75rem;
+      padding: 10px 4px;
+      font-size: 0.88rem;
       font-weight: 700;
-      border-radius: 6px;
+      border-radius: 8px;
     }
 
-    /* Square Boxes with Curved Corners */
+    /* Day Box Styling */
     .day-cell {
       background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 12px; /* Square Curved Corner Styling */
-      padding: 4px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
+      transition: border 0.15s ease;
     }
 
     .day-cell.empty { background: transparent; border: none; }
-    .day-cell.sunday { background: var(--bg-sunday); }
 
-    /* Holiday Highlight Styles */
-    .day-cell.is-govt { background-color: var(--bg-govt) !important; border-color: var(--color-govt) !important; }
-    .day-cell.is-jntuh { background-color: var(--bg-jntuh) !important; border-color: var(--color-jntuh) !important; }
-    .day-cell.is-optional { background-color: var(--bg-optional) !important; border-color: var(--color-optional) !important; }
-    .day-cell.is-festival { background-color: var(--bg-festival) !important; border-color: var(--color-festival) !important; }
+    /* Light Green Background for Sundays & Holidays */
+    .day-cell.highlight-green {
+      background-color: #dcfce7 !important;
+      border-color: #bbf7d0 !important;
+    }
+
+    /* Selected/Current Day Dark Outline matching screenshot */
+    .day-cell.active-day {
+      border: 2px solid #0f172a !important;
+    }
 
     .cell-top { display: flex; justify-content: space-between; align-items: flex-start; line-height: 1; }
-    .date-num { font-size: 0.85rem; font-weight: 800; color: #0f172a; }
-    .day-cell.sunday .date-num { color: var(--color-sunday); }
+    
+    /* Date Number Top-Left */
+    .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
 
-    .holiday-badge {
-      font-size: 0.55rem;
-      padding: 1px 3px;
-      border-radius: 3px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 70%;
-      color: #fff;
-    }
-    .badge-govt { background: var(--color-govt); }
-    .badge-jntuh { background: var(--color-jntuh); }
-    .badge-optional { background: var(--color-optional); }
-    .badge-festival { background: var(--color-festival); }
-
-    .key-tithi-tag {
-      font-size: 0.55rem;
-      padding: 1px 3px;
-      border-radius: 3px;
-      font-weight: 800;
-      margin-top: 1px;
-      display: inline-block;
-      line-height: 1;
-      white-space: nowrap;
-    }
-    .tag-pournami { background-color: #fef08a; color: #854d0e; border: 1px solid #fde047; }
-    .tag-amavasya { background-color: #334155; color: #ffffff; }
-    .tag-ashtami  { background-color: #e0e7ff; color: #3730a3; }
-    .tag-navami   { background-color: #fce7f3; color: #9d174d; }
-    .tag-dashami  { background-color: #ccfbf1; color: #115e59; }
-
+    /* Holiday & Event Labels */
     .event-desc {
-      font-size: 0.58rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      color: #1e293b;
-      margin-top: 1px;
-      line-height: 1.1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 2px;
     }
 
-    /* Panchang Details Footer */
+    /* Panchang Sub-text */
     .panchang-box {
-      margin-top: 2px;
-      background: rgba(241, 245, 249, 0.9);
-      border-radius: 4px;
-      padding: 1px 3px;
-      font-size: 0.52rem;
-      line-height: 1.1;
-      color: #334155;
-      border-top: 1px solid #cbd5e1;
+      font-size: 0.65rem;
+      color: #475569;
+      font-weight: 600;
+      margin-top: 1px;
     }
-    .panchang-masa { font-weight: 700; color: #1e3a8a; }
-    .panchang-tithi { font-weight: 600; color: #b45309; }
 
-    /* Daily Input Notes Area */
+    /* Integrated Notes Area */
     .day-note {
       width: 100%;
       flex-grow: 1;
-      margin-top: 2px;
-      border: 1px solid #cbd5e1;
+      margin-top: 4px;
+      border: 1px solid transparent;
       border-radius: 6px;
       resize: none;
       padding: 2px 4px;
-      font-size: 0.65rem;
-      background: rgba(255, 255, 255, 0.92);
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.4);
       color: #0f172a;
-      line-height: 1.15;
+      line-height: 1.2;
     }
-    .day-note:focus {
+
+    .day-note:hover, .day-note:focus {
       outline: none;
-      border-color: #1e3a8a;
+      border-color: #cbd5e1;
       background: #ffffff;
     }
 
     .college-panel {
-      margin-top: 4px;
+      margin-top: 6px;
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 0.7rem;
+      padding: 4px 10px;
+      font-size: 0.72rem;
       display: flex;
       justify-content: space-between;
       flex-shrink: 0;
@@ -230,7 +175,7 @@
 </head>
 <body>
 
-  <!-- Controls: Year & Month Filters -->
+  <!-- Controls: Year & Month -->
   <div class="filter-bar">
     <div class="filter-group">
       <span class="filter-label">Year:</span>
@@ -251,7 +196,7 @@
         <option value="5">June</option>
         <option value="6">July</option>
         <option value="7">August</option>
-        <option value="8">September</option>
+        <option value="8" selected>September</option>
         <option value="9">October</option>
         <option value="10">November</option>
         <option value="11">December</option>
@@ -259,7 +204,7 @@
     </div>
   </div>
 
-  <!-- Main Grid Area -->
+  <!-- Calendar Grid -->
   <div class="calendar-container" id="calendar-output"></div>
 
   <script>
@@ -301,60 +246,39 @@
       let paksham = tithiVal < 15 ? "Shukla" : "Krishna";
       let tithiName = tithiVal < 15 ? tithiNamesShukla[tithiVal] : tithiNamesKrishna[tithiVal - 15];
 
-      return {
-        masa: lunarMasas[masaIdx],
-        paksham: paksham,
-        tithi: tithiName
-      };
+      return { masa: lunarMasas[masaIdx], paksham: paksham, tithi: tithiName };
     }
 
     const holidaysData2026 = {
-      "1-1": { name: "New Year", type: "national", badge: "New Year" },
-      "1-13": { name: "Bhogi", type: "festival", badge: "Bhogi" },
-      "1-14": { name: "Sankranti / Pongal", type: "govt", badge: "Govt Holiday" },
-      "1-15": { name: "Kanuma", type: "optional", badge: "Optional" },
-      "1-26": { name: "Republic Day", type: "govt", badge: "Govt Holiday" },
-      "2-15": { name: "Maha Shivaratri", type: "govt", badge: "Govt Holiday" },
-      "3-3": { name: "Holi", type: "govt", badge: "Govt Holiday" },
-      "3-19": { name: "Ugadi", type: "govt", badge: "Govt Holiday" },
-      "3-21": { name: "Eid-ul-Fitr (Ramzan)", type: "govt", badge: "Govt Holiday" },
-      "3-27": { name: "Sri Rama Navami", type: "govt", badge: "Govt Holiday" },
-      "4-3": { name: "Good Friday", type: "govt", badge: "Govt Holiday" },
-      "4-14": { name: "Dr. Ambedkar Jayanti", type: "govt", badge: "Govt Holiday" },
-      "5-1": { name: "May Day", type: "govt", badge: "Govt Holiday" },
-      "5-27": { name: "Bakrid (Eid-ul-Adha)", type: "govt", badge: "Govt Holiday" },
-      "6-2": { name: "Telangana Formation Day", type: "govt", badge: "Govt Holiday" },
-      "6-25": { name: "Muharram", type: "govt", badge: "Govt Holiday" },
-      "7-20": { name: "Bonalu", type: "govt", badge: "Govt Holiday" },
-      "8-15": { name: "Independence Day", type: "govt", badge: "Govt Holiday" },
-      "8-25": { name: "Milad-un-Nabi", type: "govt", badge: "Govt Holiday" },
-      "8-28": { name: "Varalakshmi Vratam", type: "cultural", badge: "Cultural" },
-      "9-4": { name: "Sri Krishna Janmashtami", type: "govt", badge: "Govt Holiday" },
-      "9-14": { name: "Ganesh Chaturthi", type: "govt", badge: "Govt Holiday" },
-      "10-2": { name: "Gandhi Jayanti", type: "govt", badge: "Govt Holiday" },
-      "10-12": { name: "Bathukamma Starts", type: "cultural", badge: "Festival" },
-      "10-19": { name: "Durgashtami", type: "govt", badge: "Govt Holiday" },
-      "10-20": { name: "Vijayadashami / Dasara", type: "govt", badge: "Govt Holiday" },
-      "11-8": { name: "Diwali", type: "govt", badge: "Govt Holiday" },
-      "11-24": { name: "Kartika Pournami", type: "govt", badge: "Govt Holiday" },
-      "12-25": { name: "Christmas", type: "govt", badge: "Govt Holiday" }
+      "1-1": "New Year",
+      "1-13": "Bhogi",
+      "1-14": "Sankranti / Pongal",
+      "1-15": "Kanuma",
+      "1-26": "Republic Day",
+      "2-15": "Maha Shivaratri",
+      "3-3": "Holi",
+      "3-19": "Ugadi",
+      "3-21": "Eid-ul-Fitr (Ramzan)",
+      "3-27": "Sri Rama Navami",
+      "4-3": "Good Friday",
+      "4-14": "Dr. Ambedkar Jayanti",
+      "5-1": "May Day",
+      "5-27": "Bakrid (Eid-ul-Adha)",
+      "6-2": "Telangana Formation Day",
+      "6-25": "Muharram",
+      "7-20": "Bonalu",
+      "8-15": "Independence Day",
+      "8-25": "Milad-un-Nabi",
+      "9-4": "Sri Krishna Janmashtami",
+      "9-14": "Vinayaka Chavithi",
+      "10-2": "Gandhi Jayanti",
+      "10-12": "Bathukamma Vac.",
+      "10-19": "Durgashtami",
+      "10-20": "Vijayadashami / Dasara",
+      "11-8": "Diwali",
+      "11-24": "Kartika Pournami",
+      "12-25": "Christmas"
     };
-
-    const jntuhVacations2026 = [
-      { start: "1-12", end: "1-17", label: "Sankranti Vacation (JNTUH)" },
-      { start: "5-11", end: "6-20", label: "Summer Vacation" },
-      { start: "10-12", end: "10-17", label: "Dasara Vacation (JNTUH)" }
-    ];
-
-    function checkJntuhVacation(m, d, year) {
-      if (year !== 2026) return null;
-      for (let vac of jntuhVacations2026) {
-        const [sM, sD] = vac.start.split('-').map(Number);
-        const [eM, eD] = vac.end.split('-').map(Number);
-        if (m >= sM && m <= eM && d >= sD && d <= eD) return vac.label;
-      }
-      return null;
-    }
 
     function applyFilters() {
       const year = parseInt(document.getElementById("yearFilter").value);
@@ -377,7 +301,7 @@
       `;
 
       weekDaysEn.forEach(w => {
-        monthHtml += `<div class="grid-header">${w}</div>`;
+        monthHtml += `<div class="day-header">${w}</div>`;
       });
 
       for (let i = 0; i < firstDay; i++) {
@@ -391,68 +315,38 @@
 
         let isSunday = (dayOfWeek === 0);
         let isSaturday = (dayOfWeek === 6);
-        let jntuhSatLabel = "";
+        let holidayName = holidays[`${m + 1}-${d}`] || "";
 
         if (isSaturday) {
           satCount++;
-          if (satCount === 2 || satCount === 4) {
-            jntuhSatLabel = `${satCount}th Saturday (JNTUH)`;
-          }
+          if (satCount === 2) holidayName = "2nd Saturday";
+          if (satCount === 4) holidayName = "4th Saturday";
         }
 
-        const holiday = holidays[`${m + 1}-${d}`];
-        const jntuhVac = checkJntuhVacation(m + 1, d, year);
+        if (isSunday && !holidayName) {
+          holidayName = "Sunday";
+        }
+
+        const isGreenCell = isSunday || Boolean(holidayName);
+        const isToday = (year === 2026 && m === 8 && d === 6); // Matches Sep 6 active box in screenshot
+
         const panchang = getTeluguPanchang(year, m, d);
         const savedNote = localStorage.getItem(dateKey) || "";
 
         let cellClass = "day-cell";
-        if (isSunday) cellClass += " sunday";
-
-        let badgeHtml = "";
-        let descText = "";
-
-        if (holiday) {
-          cellClass += ` is-${holiday.type}`;
-          badgeHtml = `<span class="holiday-badge badge-${holiday.type}">${holiday.badge}</span>`;
-          descText = holiday.name;
-        } else if (jntuhSatLabel && year === 2026) {
-          cellClass += " is-jntuh";
-          badgeHtml = `<span class="holiday-badge badge-jntuh">JNTUH</span>`;
-          descText = jntuhSatLabel;
-        } else if (jntuhVac) {
-          cellClass += " is-jntuh";
-          badgeHtml = `<span class="holiday-badge badge-jntuh">Vacation</span>`;
-          descText = jntuhVac;
-        }
-
-        let tithiTag = "";
-        if (panchang.tithi === "Pournami") {
-          tithiTag = `<span class="key-tithi-tag tag-pournami">🌕 Pournami</span>`;
-        } else if (panchang.tithi === "Amavasya") {
-          tithiTag = `<span class="key-tithi-tag tag-amavasya">🌑 Amavasya</span>`;
-        } else if (panchang.tithi === "Ashtami") {
-          tithiTag = `<span class="key-tithi-tag tag-ashtami">✨ Ashtami</span>`;
-        } else if (panchang.tithi === "Navami") {
-          tithiTag = `<span class="key-tithi-tag tag-navami">✨ Navami</span>`;
-        } else if (panchang.tithi === "Dashami") {
-          tithiTag = `<span class="key-tithi-tag tag-dashami">✨ Dashami</span>`;
-        }
+        if (isGreenCell) cellClass += " highlight-green";
+        if (isToday) cellClass += " active-day";
 
         monthHtml += `
           <div class="${cellClass}">
             <div class="cell-top">
               <span class="date-num">${d}</span>
-              ${badgeHtml}
             </div>
-            ${tithiTag}
-            ${descText ? `<div class="event-desc" title="${descText}">${descText}</div>` : ''}
+            ${holidayName ? `<div class="event-desc">${holidayName}</div>` : ''}
             
-            <div class="panchang-box">
-              <span class="panchang-masa">${panchang.masa}</span> | 
-              <span class="panchang-tithi">${panchang.paksham} ${panchang.tithi}</span>
-            </div>
+            <div class="panchang-box">${panchang.paksham} ${panchang.tithi}</div>
 
-            <textarea class="day-note" placeholder="Add note..." data-key="${dateKey}">${savedNote}</textarea>
+            <textarea class="day-note" placeholder="Note..." data-key="${dateKey}">${savedNote}</textarea>
           </div>
         `;
       }
@@ -468,19 +362,12 @@
 
       container.innerHTML = monthHtml;
 
-      // Attach local storage save listeners
       document.querySelectorAll(".day-note").forEach(textarea => {
         textarea.addEventListener("input", (e) => {
           const key = e.target.getAttribute("data-key");
           localStorage.setItem(key, e.target.value);
         });
       });
-    }
-
-    const today = new Date();
-    if (today.getFullYear() === 2026 || today.getFullYear() === 2027) {
-      document.getElementById("yearFilter").value = today.getFullYear();
-      document.getElementById("monthFilter").value = today.getMonth();
     }
 
     window.onload = function() {
