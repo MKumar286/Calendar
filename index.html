@@ -6,21 +6,21 @@
   <title>2026 JNTUH & Telugu Calendar</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f1f5f9; color: #1e293b; padding: 8px; height: 100vh; display: flex; flex-direction: column; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
     
-    header { display: flex; justify-content: space-between; align-items: center; padding: 4px 12px; margin-bottom: 6px; background: #fff; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; margin-bottom: 8px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     h1 { font-size: 1.1rem; color: #0f172a; font-weight: 700; }
     
     .controls { display: flex; align-items: center; gap: 8px; }
-    select { padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600; }
+    select { padding: 4px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600; }
     
-    .calendar-container { flex-grow: 1; display: flex; flex-direction: column; max-height: calc(100vh - 55px); }
+    .calendar-container { flex-grow: 1; display: flex; flex-direction: column; max-height: calc(100vh - 60px); }
     
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       grid-template-rows: auto repeat(6, 1fr);
-      gap: 4px;
+      gap: 6px;
       height: 100%;
     }
     
@@ -28,28 +28,36 @@
       background: #0f172a;
       color: #fff;
       text-align: center;
-      padding: 4px;
+      padding: 6px;
       font-weight: 600;
       font-size: 0.75rem;
-      border-radius: 4px;
+      border-radius: 8px;
     }
     
+    /* Square curved corner boxes */
     .day-cell {
       background: #ffffff;
-      border-radius: 4px;
-      border: 1px solid #cbd5e1;
-      padding: 3px;
+      border-radius: 14px; /* Curved corners */
+      border: 2px solid #cbd5e1;
+      padding: 5px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      aspect-ratio: 1 / 0.95; /* Keeps box shapes square and balanced */
     }
     
     .day-cell.empty { background: transparent; border: none; }
     
-    /* Full box light green background for Sundays & Govt/JNTUH Holidays */
-    .day-cell.highlight-green {
-      background-color: #dcfce7 !important;
-      border-color: #86efac !important;
+    /* Thick Vibrant Green background for Sundays & Holidays */
+    .day-cell.highlight-thick-green {
+      background-color: #16a34a !important; /* Thick Green */
+      border-color: #15803d !important;
+      color: #ffffff !important;
+    }
+
+    /* Adjusted date numbers on green background */
+    .day-cell.highlight-thick-green .date-number {
+      color: #ffffff !important;
     }
     
     .cell-top {
@@ -57,18 +65,18 @@
       justify-content: space-between;
       align-items: center;
       line-height: 1;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
-    .date-number { font-weight: 700; font-size: 0.8rem; color: #0f172a; }
+    .date-number { font-weight: 800; font-size: 0.85rem; color: #0f172a; }
     
     .holiday-badge {
-      font-size: 0.6rem;
-      background-color: #15803d;
-      color: #ffffff;
-      padding: 1px 3px;
-      border-radius: 3px;
-      font-weight: 600;
+      font-size: 0.58rem;
+      background-color: #ffffff;
+      color: #15803d;
+      padding: 1px 4px;
+      border-radius: 6px;
+      font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -76,49 +84,57 @@
     }
 
     .tithi-badge {
-      font-size: 0.62rem;
-      color: #b45309;
+      font-size: 0.6rem;
+      color: #78350f;
       background-color: #fef3c7;
       border: 1px solid #fde68a;
-      padding: 1px 3px;
-      border-radius: 3px;
+      padding: 1px 4px;
+      border-radius: 6px;
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .day-cell.highlight-green .tithi-badge {
+    /* Tithi badge adjusted when on thick green cell */
+    .day-cell.highlight-thick-green .tithi-badge {
       background-color: #fef08a;
       border-color: #fde047;
-      color: #854d0e;
+      color: #713f12;
     }
     
     .daily-input {
       width: 100%;
       flex-grow: 1;
-      border: 1px solid #e2e8f0;
-      border-radius: 3px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px; /* Curved textarea corners */
       resize: none;
-      padding: 2px 4px;
+      padding: 3px 5px;
       font-size: 0.72rem;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.95);
+      color: #0f172a;
       line-height: 1.2;
+    }
+
+    .day-cell.highlight-thick-green .daily-input {
+      border-color: #86efac;
+      background: rgba(255, 255, 255, 0.9);
     }
     
     .daily-input:focus {
       outline: none;
-      border-color: #16a34a;
+      border-color: #0f172a;
       background: #fff;
     }
 
     @media (max-width: 768px) {
       body { padding: 4px; }
+      .day-cell { border-radius: 10px; padding: 3px; }
       .date-number { font-size: 0.7rem; }
-      .holiday-badge, .tithi-badge { font-size: 0.55rem; }
-      .daily-input { font-size: 0.65rem; }
+      .holiday-badge, .tithi-badge { font-size: 0.52rem; }
+      .daily-input { font-size: 0.65rem; border-radius: 6px; }
     }
   </style>
 </head>
@@ -144,7 +160,7 @@
 
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    // Holidays (Govt & JNTUH Specific) Format: 'M-D'
+    // Government & JNTUH Holidays
     const holidays2026 = {
       "1-1": "New Year",
       "1-14": "Bhogi / Sankranti Vac.",
@@ -175,7 +191,7 @@
       "12-25": "Christmas"
     };
 
-    // Amavasya & Pournami with precise timings
+    // Telugu Tithi Timings
     const teluguTithis2026 = {
       "1-3": "Pournami (till 3:12 PM)",
       "1-18": "Amavasya (till 11:45 AM)",
@@ -231,7 +247,6 @@
       const firstDay = new Date(2026, selectedMonth, 1).getDay();
       const daysInMonth = new Date(2026, selectedMonth + 1, 0).getDate();
 
-      // Empty padding cells
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell empty";
@@ -240,10 +255,9 @@
 
       let saturdayCount = 0;
 
-      // Populate day cells
       for (let day = 1; day <= daysInMonth; day++) {
         const dateObj = new Date(2026, selectedMonth, day);
-        const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+        const dayOfWeek = dateObj.getDay();
         const dateKey = `2026-${selectedMonth + 1}-${day}`;
         const monthDayKey = `${selectedMonth + 1}-${day}`;
         
@@ -268,9 +282,9 @@
         const cell = document.createElement("div");
         cell.className = "day-cell";
 
-        // Whole box highlighted in light green for Sundays & Holidays
+        // Whole box highlighted in thick green for Sundays & Holidays
         if (isHoliday) {
-          cell.classList.add("highlight-green");
+          cell.classList.add("highlight-thick-green");
         }
 
         let badgeText = "";
@@ -294,7 +308,6 @@
         calendar.appendChild(cell);
       }
 
-      // Save input changes locally
       document.querySelectorAll(".daily-input").forEach(input => {
         input.addEventListener("input", (e) => {
           const key = e.target.getAttribute("data-key");
