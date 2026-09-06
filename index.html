@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 Daily Updates Calendar</title>
+  <title>2026 Daily Updates Calendar with Holidays</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
@@ -35,7 +35,7 @@
       background: #fff;
       border-radius: 8px;
       border: 1px solid #e2e8f0;
-      min-height: 120px;
+      min-height: 130px;
       padding: 8px;
       display: flex;
       flex-direction: column;
@@ -44,29 +44,55 @@
     
     .day-cell.empty { background: transparent; border: none; box-shadow: none; }
     
-    .date-number { font-weight: bold; font-size: 0.9rem; color: #475569; margin-bottom: 6px; }
+    /* Light green background for Sundays & Government Holidays */
+    .day-cell.highlight-green {
+      background-color: #dcfce7 !important;
+      border-color: #86efac;
+    }
+    
+    .cell-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .date-number { font-weight: bold; font-size: 0.9rem; color: #1e293b; }
+    
+    .holiday-badge {
+      font-size: 0.7rem;
+      background-color: #166534;
+      color: #ffffff;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-align: right;
+      line-height: 1.1;
+      max-width: 70%;
+    }
     
     .daily-input {
       width: 100%;
       flex-grow: 1;
-      border: 1px solid #f1f5f9;
+      border: 1px solid #cbd5e1;
       border-radius: 4px;
       resize: none;
       padding: 6px;
       font-size: 0.85rem;
-      background: #fafafa;
+      background: rgba(255, 255, 255, 0.8);
     }
     
     .daily-input:focus {
       outline: none;
-      border-color: #3b82f6;
+      border-color: #16a34a;
       background: #fff;
     }
 
     @media (max-width: 768px) {
       .calendar-grid { grid-template-columns: repeat(7, minmax(40px, 1fr)); gap: 4px; }
-      .day-cell { min-height: 80px; padding: 4px; }
+      .day-cell { min-height: 90px; padding: 4px; }
       .date-number { font-size: 0.75rem; }
+      .holiday-badge { font-size: 0.6rem; }
       .daily-input { font-size: 0.75rem; }
     }
   </style>
@@ -74,7 +100,7 @@
 <body>
 
   <header>
-    <h1>2026 Planner & Daily Updates</h1>
+    <h1>2026 Daily Planner & Holidays</h1>
     <div class="controls">
       <label for="monthSelect">Select Month:</label>
       <select id="monthSelect" onchange="renderCalendar()"></select>
@@ -90,10 +116,32 @@
     ];
 
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    // Central Government Public Holidays for 2026 (Format: 'M-D')
+    const govtHolidays2026 = {
+      "1-26": "Republic Day",
+      "3-3": "Holi",
+      "3-21": "Id-ul-Fitr",
+      "3-26": "Ram Navami",
+      "3-31": "Mahavir Jayanti",
+      "4-3": "Good Friday",
+      "4-14": "Dr. Ambedkar Jayanti",
+      "5-1": "Buddha Purnima",
+      "5-27": "Bakrid / Id-ul-Zuha",
+      "6-26": "Muharram",
+      "8-15": "Independence Day",
+      "8-26": "Id-e-Milad",
+      "9-14": "Ganesh Chaturthi",
+      "10-2": "Mahatma Gandhi Jayanti",
+      "10-20": "Dussehra",
+      "11-8": "Diwali",
+      "11-24": "Guru Nanak Jayanti",
+      "12-25": "Christmas Day"
+    };
+
     const monthSelect = document.getElementById("monthSelect");
     const calendar = document.getElementById("calendar");
 
-    // Populate month dropdown
     months.forEach((month, index) => {
       const option = document.createElement("option");
       option.value = index;
@@ -101,7 +149,6 @@
       monthSelect.appendChild(option);
     });
 
-    // Default to current month or January
     const currentMonth = new Date().getFullYear() === 2026 ? new Date().getMonth() : 0;
     monthSelect.value = currentMonth;
 
@@ -109,7 +156,6 @@
       calendar.innerHTML = "";
       const selectedMonth = parseInt(monthSelect.value);
       
-      // Render weekday headers
       daysOfWeek.forEach(day => {
         const header = document.createElement("div");
         header.className = "day-header";
@@ -120,30 +166,53 @@
       const firstDay = new Date(2026, selectedMonth, 1).getDay();
       const daysInMonth = new Date(2026, selectedMonth + 1, 0).getDate();
 
-      // Empty slots before month starts
+      // Empty padding cells before 1st day of month
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell empty";
         calendar.appendChild(emptyCell);
       }
 
-      // Render days
+      // Populate day cells
       for (let day = 1; day <= daysInMonth; day++) {
+        const dateObj = new Date(2026, selectedMonth, day);
+        const dayOfWeek = dateObj.getDay(); // 0 = Sunday
         const dateKey = `2026-${selectedMonth + 1}-${day}`;
-        const savedNote = localStorage.getItem(dateKey) || "";
+        const monthDayKey = `${selectedMonth + 1}-${day}`;
+        
+        const isSunday = (dayOfWeek === 0);
+        const holidayReason = govtHolidays2026[monthDayKey] || "";
+        const isGovtHoliday = Boolean(holidayReason);
 
         const cell = document.createElement("div");
         cell.className = "day-cell";
 
+        // Apply light green highlighting for Sunday or Govt Holiday
+        if (isSunday || isGovtHoliday) {
+          cell.classList.add("highlight-green");
+        }
+
+        let badgeText = "";
+        if (isGovtHoliday) {
+          badgeText = holidayReason;
+        } else if (isSunday) {
+          badgeText = "Sunday";
+        }
+
+        const savedNote = localStorage.getItem(dateKey) || "";
+
         cell.innerHTML = `
-          <div class="date-number">${day}</div>
+          <div class="cell-top">
+            <span class="date-number">${day}</span>
+            ${badgeText ? `<span class="holiday-badge">${badgeText}</span>` : ""}
+          </div>
           <textarea class="daily-input" placeholder="Add update..." data-key="${dateKey}">${savedNote}</textarea>
         `;
 
         calendar.appendChild(cell);
       }
 
-      // Save content on change
+      // Save input changes locally
       document.querySelectorAll(".daily-input").forEach(input => {
         input.addEventListener("input", (e) => {
           const key = e.target.getAttribute("data-key");
