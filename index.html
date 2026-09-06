@@ -10,7 +10,7 @@
     body {
       background-color: #ffffff;
       color: #111827;
-      padding: 16px;
+      padding: 12px;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -26,7 +26,7 @@
       color: #fff;
       padding: 8px 16px;
       border-radius: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       flex-shrink: 0;
     }
 
@@ -44,49 +44,48 @@
       cursor: pointer;
     }
 
-    /* Main Calendar Container */
+    /* Main Calendar Container with Vertical Scrollbar */
     .calendar-container {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-y: auto; /* Vertical scrollbar if content exceeds screen height */
+      padding-right: 4px;
     }
 
     .month-card {
-      height: 100%;
       display: flex;
       flex-direction: column;
+      min-height: 100%;
     }
 
     .month-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 8px;
-      margin-bottom: 8px;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
       flex-shrink: 0;
     }
     
-    .month-title { font-size: 1.25rem; font-weight: 800; color: #0f172a; }
+    .month-title { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
     .samvatsara-info { font-size: 0.78rem; background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 6px; font-weight: 700; }
 
     /* Calendar Grid */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: auto repeat(5, 1fr);
-      gap: 8px;
+      gap: 6px;
       flex-grow: 1;
-      height: 100%;
     }
 
-    /* Grey Header Pills matching screenshot */
+    /* Grey Header Pills */
     .day-header {
       background: #f1f5f9;
       color: #1e293b;
       text-align: center;
-      padding: 10px 4px;
-      font-size: 0.88rem;
+      padding: 8px 4px;
+      font-size: 0.85rem;
       font-weight: 700;
       border-radius: 8px;
     }
@@ -94,79 +93,79 @@
     /* Day Box Styling */
     .day-cell {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
+      border: 1.5px solid #e2e8f0;
       border-radius: 12px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       display: flex;
       flex-direction: column;
       position: relative;
-      overflow: hidden;
-      transition: border 0.15s ease;
+      min-height: 110px; /* Ensures all weeks have adequate space */
     }
 
-    .day-cell.empty { background: transparent; border: none; }
+    .day-cell.empty { background: transparent; border: none; min-height: 0; }
 
-    /* Light Green Background for Sundays & Holidays */
+    /* Thick Vibrant Green for Sundays & Holidays */
     .day-cell.highlight-green {
-      background-color: #dcfce7 !important;
-      border-color: #bbf7d0 !important;
+      background-color: #86efac !important; /* Thick Green */
+      border: 2px solid #16a34a !important; /* Deep Green Border */
     }
 
-    /* Selected/Current Day Dark Outline matching screenshot */
+    /* Selected/Current Day Dark Outline */
     .day-cell.active-day {
-      border: 2px solid #0f172a !important;
+      border: 2.5px solid #0f172a !important;
     }
 
     .cell-top { display: flex; justify-content: space-between; align-items: flex-start; line-height: 1; }
     
     /* Date Number Top-Left */
-    .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+    .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 3px; }
 
     /* Holiday & Event Labels */
     .event-desc {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #0f172a;
-      line-height: 1.25;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #064e3b; /* Dark Green for contrast on thick green background */
+      line-height: 1.2;
       margin-bottom: 2px;
     }
 
     /* Panchang Sub-text */
     .panchang-box {
-      font-size: 0.65rem;
-      color: #475569;
-      font-weight: 600;
+      font-size: 0.62rem;
+      color: #1e293b;
+      font-weight: 700;
       margin-top: 1px;
     }
 
-    /* Integrated Notes Area */
+    /* Integrated Notes Area - Thick Red Text */
     .day-note {
       width: 100%;
       flex-grow: 1;
       margin-top: 4px;
-      border: 1px solid transparent;
+      border: 1px solid rgba(15, 23, 42, 0.2);
       border-radius: 6px;
       resize: none;
-      padding: 2px 4px;
-      font-size: 0.72rem;
-      background: rgba(255, 255, 255, 0.4);
-      color: #0f172a;
+      padding: 3px 5px;
+      font-size: 0.75rem;
+      font-weight: 800 !important; /* Thick Bold Text */
+      color: #dc2626 !important;   /* Thick Red Colour */
+      background: rgba(255, 255, 255, 0.7);
       line-height: 1.2;
     }
 
     .day-note:hover, .day-note:focus {
       outline: none;
-      border-color: #cbd5e1;
+      border-color: #dc2626;
       background: #ffffff;
     }
 
     .college-panel {
-      margin-top: 6px;
+      margin-top: 8px;
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.72rem;
+      padding: 6px 10px;
+      font-size: 0.75rem;
       display: flex;
       justify-content: space-between;
       flex-shrink: 0;
@@ -204,7 +203,7 @@
     </div>
   </div>
 
-  <!-- Calendar Grid -->
+  <!-- Scrollable Calendar Grid Container -->
   <div class="calendar-container" id="calendar-output"></div>
 
   <script>
@@ -328,7 +327,7 @@
         }
 
         const isGreenCell = isSunday || Boolean(holidayName);
-        const isToday = (year === 2026 && m === 8 && d === 6); // Matches Sep 6 active box in screenshot
+        const isToday = (year === 2026 && m === 8 && d === 6);
 
         const panchang = getTeluguPanchang(year, m, d);
         const savedNote = localStorage.getItem(dateKey) || "";
