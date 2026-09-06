@@ -44,13 +44,13 @@
       cursor: pointer;
     }
 
-    /* Main Calendar Container with Vertical Scrollbar */
+    /* Main Calendar Container */
     .calendar-container {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
-      padding-right: 4px;
+      padding-right: 2px;
     }
 
     .month-card {
@@ -90,10 +90,8 @@
       border-radius: 8px;
     }
 
-    /* Day Box Styling */
+    /* Base Day Box Styling */
     .day-cell {
-      background: #ffffff;
-      border: 1.5px solid #e2e8f0;
       border-radius: 12px;
       padding: 6px 8px;
       display: flex;
@@ -102,7 +100,13 @@
       min-height: 110px;
     }
 
-    .day-cell.empty { background: transparent; border: none; min-height: 0; }
+    .day-cell.empty { background: transparent !important; border: none !important; min-height: 0; }
+
+    /* Orange Background for Regular Weekdays */
+    .day-cell.weekday-orange {
+      background-color: #ffedd5 !important; /* Light Vibrant Orange */
+      border: 1.5px solid #fdba74 !important;
+    }
 
     /* Thick Vibrant Green for Sundays & Holidays */
     .day-cell.highlight-green {
@@ -110,7 +114,7 @@
       border: 2px solid #16a34a !important;
     }
 
-    /* Selected/Current Day Dark Outline */
+    /* Active/Current Day Outline */
     .day-cell.active-day {
       border: 2.5px solid #0f172a !important;
     }
@@ -123,17 +127,14 @@
       margin-bottom: 2px;
     }
     
-    /* Date Number Top-Left */
     .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; }
 
-    /* Top Right Moon Symbol */
     .moon-symbol {
       font-size: 0.95rem;
       line-height: 1;
       filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.15));
     }
 
-    /* Holiday & Event Labels */
     .event-desc {
       font-size: 0.75rem;
       font-weight: 800;
@@ -142,7 +143,6 @@
       margin-bottom: 2px;
     }
 
-    /* Panchang Sub-text */
     .panchang-box {
       font-size: 0.62rem;
       color: #1e293b;
@@ -162,7 +162,7 @@
       font-size: 0.75rem;
       font-weight: 800 !important;
       color: #dc2626 !important;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.85);
       line-height: 1.2;
     }
 
@@ -182,6 +182,61 @@
       display: flex;
       justify-content: space-between;
       flex-shrink: 0;
+    }
+
+    /* Mobile Responsive Layout Styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 6px;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      .filter-bar {
+        padding: 6px 10px;
+        gap: 10px;
+        justify-content: space-between;
+      }
+
+      .filter-group { gap: 4px; }
+      .filter-label { font-size: 0.8rem; }
+      select { font-size: 0.8rem; padding: 4px 8px; }
+
+      .month-title { font-size: 1.05rem; }
+      .samvatsara-info { font-size: 0.68rem; padding: 2px 6px; }
+
+      .calendar-grid { gap: 3px; }
+
+      .day-header {
+        font-size: 0.72rem;
+        padding: 5px 2px;
+        border-radius: 5px;
+      }
+
+      .day-cell {
+        min-height: 85px;
+        padding: 3px 4px;
+        border-radius: 8px;
+      }
+
+      .date-num { font-size: 0.8rem; }
+      .moon-symbol { font-size: 0.8rem; }
+      .event-desc { font-size: 0.62rem; }
+      .panchang-box { font-size: 0.52rem; }
+
+      .day-note {
+        font-size: 0.7rem;
+        padding: 2px 3px;
+        margin-top: 2px;
+      }
+
+      .college-panel {
+        flex-direction: column;
+        gap: 2px;
+        font-size: 0.68rem;
+        padding: 4px 6px;
+      }
     }
   </style>
 </head>
@@ -345,7 +400,6 @@
         const panchang = getTeluguPanchang(year, m, d);
         const savedNote = localStorage.getItem(dateKey) || "";
 
-        // Moon Symbol Assignment for Major Days
         let moonIcon = "";
         if (panchang.tithi === "Pournami") {
           moonIcon = `<span class="moon-symbol" title="Pournami (Full Moon)">🌕</span>`;
@@ -358,7 +412,12 @@
         }
 
         let cellClass = "day-cell";
-        if (isGreenCell) cellClass += " highlight-green";
+        if (isGreenCell) {
+          cellClass += " highlight-green";
+        } else {
+          cellClass += " weekday-orange"; // Regular Weekday Orange Background
+        }
+        
         if (isToday) cellClass += " active-day";
 
         monthHtml += `
