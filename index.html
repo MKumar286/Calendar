@@ -44,7 +44,7 @@
       cursor: pointer;
     }
 
-    /* Main Calendar Container */
+    /* Main Calendar Container with Vertical Scrollbar */
     .calendar-container {
       flex-grow: 1;
       display: flex;
@@ -90,8 +90,10 @@
       border-radius: 8px;
     }
 
-    /* Base Day Box Styling */
+    /* Regular Clean Day Box Styling */
     .day-cell {
+      background-color: #ffffff;
+      border: 1.5px solid #e2e8f0;
       border-radius: 12px;
       padding: 6px 8px;
       display: flex;
@@ -101,12 +103,6 @@
     }
 
     .day-cell.empty { background: transparent !important; border: none !important; min-height: 0; }
-
-    /* Orange Background for Regular Weekdays */
-    .day-cell.weekday-orange {
-      background-color: #ffedd5 !important; /* Light Vibrant Orange */
-      border: 1.5px solid #fdba74 !important;
-    }
 
     /* Thick Vibrant Green for Sundays & Holidays */
     .day-cell.highlight-green {
@@ -145,7 +141,7 @@
 
     .panchang-box {
       font-size: 0.62rem;
-      color: #1e293b;
+      color: #475569;
       font-weight: 700;
       margin-top: 1px;
     }
@@ -155,14 +151,14 @@
       width: 100%;
       flex-grow: 1;
       margin-top: 4px;
-      border: 1px solid rgba(15, 23, 42, 0.2);
+      border: 1px solid rgba(15, 23, 42, 0.15);
       border-radius: 6px;
       resize: none;
       padding: 3px 5px;
       font-size: 0.75rem;
       font-weight: 800 !important;
       color: #dc2626 !important;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       line-height: 1.2;
     }
 
@@ -184,7 +180,7 @@
       flex-shrink: 0;
     }
 
-    /* Mobile Responsive Layout Styles */
+    /* Mobile Layout Adaptation */
     @media (max-width: 768px) {
       body {
         padding: 6px;
@@ -414,8 +410,6 @@
         let cellClass = "day-cell";
         if (isGreenCell) {
           cellClass += " highlight-green";
-        } else {
-          cellClass += " weekday-orange"; // Regular Weekday Orange Background
         }
         
         if (isToday) cellClass += " active-day";
