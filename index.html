@@ -3,83 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 Daily Updates Calendar with Holidays</title>
+  <title>2026 JNTUH & Telugu Calendar</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 8px; height: 100vh; display: flex; flex-direction: column; }
     
-    header { text-align: center; margin-bottom: 20px; }
-    h1 { margin: 0 0 10px 0; color: #1a365d; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 4px 12px; margin-bottom: 6px; background: #fff; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.1rem; color: #0f172a; font-weight: 700; }
     
-    .controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
-    select { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; background: #fff; cursor: pointer; }
+    .controls { display: flex; align-items: center; gap: 8px; }
+    select { padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600; }
+    
+    .calendar-container { flex-grow: 1; display: flex; flex-direction: column; max-height: calc(100vh - 55px); }
     
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-      max-width: 1200px;
-      margin: 0 auto;
+      grid-template-rows: auto repeat(6, 1fr);
+      gap: 4px;
+      height: 100%;
     }
     
     .day-header {
-      background: #1e293b;
+      background: #0f172a;
       color: #fff;
       text-align: center;
-      padding: 10px;
+      padding: 4px;
       font-weight: 600;
-      border-radius: 6px;
+      font-size: 0.75rem;
+      border-radius: 4px;
     }
     
     .day-cell {
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      min-height: 130px;
-      padding: 8px;
+      background: #ffffff;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      padding: 3px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      overflow: hidden;
     }
     
-    .day-cell.empty { background: transparent; border: none; box-shadow: none; }
+    .day-cell.empty { background: transparent; border: none; }
     
-    /* Light green background for Sundays & Government Holidays */
+    /* Full box light green background for Sundays & Govt/JNTUH Holidays */
     .day-cell.highlight-green {
       background-color: #dcfce7 !important;
-      border-color: #86efac;
+      border-color: #86efac !important;
     }
     
     .cell-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 4px;
+      align-items: center;
+      line-height: 1;
+      margin-bottom: 2px;
     }
 
-    .date-number { font-weight: bold; font-size: 0.9rem; color: #1e293b; }
+    .date-number { font-weight: 700; font-size: 0.8rem; color: #0f172a; }
     
     .holiday-badge {
-      font-size: 0.7rem;
-      background-color: #166534;
+      font-size: 0.6rem;
+      background-color: #15803d;
       color: #ffffff;
-      padding: 2px 5px;
-      border-radius: 4px;
+      padding: 1px 3px;
+      border-radius: 3px;
       font-weight: 600;
-      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 75%;
+    }
+
+    .tithi-badge {
+      font-size: 0.62rem;
+      color: #b45309;
+      background-color: #fef3c7;
+      border: 1px solid #fde68a;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: 600;
+      margin-bottom: 2px;
       line-height: 1.1;
-      max-width: 70%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .day-cell.highlight-green .tithi-badge {
+      background-color: #fef08a;
+      border-color: #fde047;
+      color: #854d0e;
     }
     
     .daily-input {
       width: 100%;
       flex-grow: 1;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      border-radius: 3px;
       resize: none;
-      padding: 6px;
-      font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.8);
+      padding: 2px 4px;
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.85);
+      line-height: 1.2;
     }
     
     .daily-input:focus {
@@ -89,25 +115,26 @@
     }
 
     @media (max-width: 768px) {
-      .calendar-grid { grid-template-columns: repeat(7, minmax(40px, 1fr)); gap: 4px; }
-      .day-cell { min-height: 90px; padding: 4px; }
-      .date-number { font-size: 0.75rem; }
-      .holiday-badge { font-size: 0.6rem; }
-      .daily-input { font-size: 0.75rem; }
+      body { padding: 4px; }
+      .date-number { font-size: 0.7rem; }
+      .holiday-badge, .tithi-badge { font-size: 0.55rem; }
+      .daily-input { font-size: 0.65rem; }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>2026 Daily Planner & Holidays</h1>
+    <h1>2026 JNTUH & Telugu Planner</h1>
     <div class="controls">
-      <label for="monthSelect">Select Month:</label>
+      <label for="monthSelect" style="font-size: 0.85rem; font-weight: 600;">Month:</label>
       <select id="monthSelect" onchange="renderCalendar()"></select>
     </div>
   </header>
 
-  <div class="calendar-grid" id="calendar"></div>
+  <div class="calendar-container">
+    <div class="calendar-grid" id="calendar"></div>
+  </div>
 
   <script>
     const months = [
@@ -117,26 +144,64 @@
 
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    // Central Government Public Holidays for 2026 (Format: 'M-D')
-    const govtHolidays2026 = {
+    // Holidays (Govt & JNTUH Specific) Format: 'M-D'
+    const holidays2026 = {
+      "1-1": "New Year",
+      "1-14": "Bhogi / Sankranti Vac.",
+      "1-15": "Sankranti / Kanuma",
       "1-26": "Republic Day",
+      "2-15": "Maha Shivaratri",
       "3-3": "Holi",
-      "3-21": "Id-ul-Fitr",
-      "3-26": "Ram Navami",
+      "3-19": "Ugadi",
+      "3-21": "Ramzan (Id-ul-Fitr)",
+      "3-27": "Sri Rama Navami",
       "3-31": "Mahavir Jayanti",
       "4-3": "Good Friday",
       "4-14": "Dr. Ambedkar Jayanti",
-      "5-1": "Buddha Purnima",
-      "5-27": "Bakrid / Id-ul-Zuha",
-      "6-26": "Muharram",
+      "5-1": "May Day",
+      "5-27": "Bakrid",
+      "6-25": "Muharram",
+      "7-20": "Bonalu",
       "8-15": "Independence Day",
-      "8-26": "Id-e-Milad",
-      "9-14": "Ganesh Chaturthi",
-      "10-2": "Mahatma Gandhi Jayanti",
-      "10-20": "Dussehra",
-      "11-8": "Diwali",
+      "8-25": "Milad-un-Nabi",
+      "9-4": "Sri Krishnashtami",
+      "9-14": "Vinayaka Chavithi",
+      "10-2": "Gandhi Jayanti",
+      "10-12": "Bathukamma Vac.",
+      "10-19": "Durgashtami",
+      "10-20": "Vijayadasami",
+      "11-8": "Deepavali",
       "11-24": "Guru Nanak Jayanti",
-      "12-25": "Christmas Day"
+      "12-25": "Christmas"
+    };
+
+    // Amavasya & Pournami with precise timings
+    const teluguTithis2026 = {
+      "1-3": "Pournami (till 3:12 PM)",
+      "1-18": "Amavasya (till 11:45 AM)",
+      "2-1": "Pournami (till 5:40 AM Feb 2)",
+      "2-17": "Amavasya (till 5:31 PM)",
+      "3-3": "Pournami (till 7:08 PM)",
+      "3-18": "Amavasya (till 11:53 PM)",
+      "4-2": "Pournami (till 7:42 AM)",
+      "4-17": "Amavasya (till 7:22 AM)",
+      "5-1": "Pournami (till 7:09 PM)",
+      "5-16": "Amavasya (till 4:31 PM)",
+      "5-31": "Pournami (till 5:15 AM Jun 1)",
+      "6-15": "Amavasya (till 3:20 AM Jun 16)",
+      "6-29": "Pournami (till 2:38 PM)",
+      "7-14": "Amavasya (till 3:45 PM)",
+      "7-29": "Pournami (till 11:10 PM)",
+      "8-13": "Amavasya (till 6:10 AM Aug 14)",
+      "8-27": "Pournami (till 9:18 AM)",
+      "9-11": "Amavasya (till 10:15 PM)",
+      "9-25": "Pournami (till 9:20 PM)",
+      "10-11": "Amavasya (till 3:40 PM)",
+      "10-25": "Pournami (till 11:12 AM)",
+      "11-10": "Amavasya (till 9:15 AM)",
+      "11-24": "Pournami (till 2:40 AM Nov 25)",
+      "12-9": "Amavasya (till 1:40 AM Dec 10)",
+      "12-23": "Pournami (till 6:44 PM)"
     };
 
     const monthSelect = document.getElementById("monthSelect");
@@ -166,34 +231,50 @@
       const firstDay = new Date(2026, selectedMonth, 1).getDay();
       const daysInMonth = new Date(2026, selectedMonth + 1, 0).getDate();
 
-      // Empty padding cells before 1st day of month
+      // Empty padding cells
       for (let i = 0; i < firstDay; i++) {
         const emptyCell = document.createElement("div");
         emptyCell.className = "day-cell empty";
         calendar.appendChild(emptyCell);
       }
 
+      let saturdayCount = 0;
+
       // Populate day cells
       for (let day = 1; day <= daysInMonth; day++) {
         const dateObj = new Date(2026, selectedMonth, day);
-        const dayOfWeek = dateObj.getDay(); // 0 = Sunday
+        const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
         const dateKey = `2026-${selectedMonth + 1}-${day}`;
         const monthDayKey = `${selectedMonth + 1}-${day}`;
         
-        const isSunday = (dayOfWeek === 0);
-        const holidayReason = govtHolidays2026[monthDayKey] || "";
-        const isGovtHoliday = Boolean(holidayReason);
+        let isSunday = (dayOfWeek === 0);
+        let isJntuhSaturdayHoliday = false;
+
+        if (dayOfWeek === 6) {
+          saturdayCount++;
+          if (saturdayCount === 2 || saturdayCount === 4) {
+            isJntuhSaturdayHoliday = true;
+          }
+        }
+
+        let holidayReason = holidays2026[monthDayKey] || "";
+        if (isJntuhSaturdayHoliday) {
+          holidayReason = saturdayCount === 2 ? "2nd Saturday" : "4th Saturday";
+        }
+
+        const isHoliday = isSunday || Boolean(holidayReason);
+        const tithiInfo = teluguTithis2026[monthDayKey] || "";
 
         const cell = document.createElement("div");
         cell.className = "day-cell";
 
-        // Apply light green highlighting for Sunday or Govt Holiday
-        if (isSunday || isGovtHoliday) {
+        // Whole box highlighted in light green for Sundays & Holidays
+        if (isHoliday) {
           cell.classList.add("highlight-green");
         }
 
         let badgeText = "";
-        if (isGovtHoliday) {
+        if (holidayReason) {
           badgeText = holidayReason;
         } else if (isSunday) {
           badgeText = "Sunday";
@@ -204,9 +285,10 @@
         cell.innerHTML = `
           <div class="cell-top">
             <span class="date-number">${day}</span>
-            ${badgeText ? `<span class="holiday-badge">${badgeText}</span>` : ""}
+            ${badgeText ? `<span class="holiday-badge" title="${badgeText}">${badgeText}</span>` : ""}
           </div>
-          <textarea class="daily-input" placeholder="Add update..." data-key="${dateKey}">${savedNote}</textarea>
+          ${tithiInfo ? `<div class="tithi-badge" title="${tithiInfo}">🌕 ${tithiInfo}</div>` : ""}
+          <textarea class="daily-input" placeholder="Update..." data-key="${dateKey}">${savedNote}</textarea>
         `;
 
         calendar.appendChild(cell);
