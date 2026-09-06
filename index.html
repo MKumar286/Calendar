@@ -49,7 +49,7 @@
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto; /* Vertical scrollbar if content exceeds screen height */
+      overflow-y: auto;
       padding-right: 4px;
     }
 
@@ -99,15 +99,15 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      min-height: 110px; /* Ensures all weeks have adequate space */
+      min-height: 110px;
     }
 
     .day-cell.empty { background: transparent; border: none; min-height: 0; }
 
     /* Thick Vibrant Green for Sundays & Holidays */
     .day-cell.highlight-green {
-      background-color: #86efac !important; /* Thick Green */
-      border: 2px solid #16a34a !important; /* Deep Green Border */
+      background-color: #86efac !important;
+      border: 2px solid #16a34a !important;
     }
 
     /* Selected/Current Day Dark Outline */
@@ -115,16 +115,29 @@
       border: 2.5px solid #0f172a !important;
     }
 
-    .cell-top { display: flex; justify-content: space-between; align-items: flex-start; line-height: 1; }
+    .cell-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
     
     /* Date Number Top-Left */
-    .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 3px; }
+    .date-num { font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+
+    /* Top Right Moon Symbol */
+    .moon-symbol {
+      font-size: 0.95rem;
+      line-height: 1;
+      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.15));
+    }
 
     /* Holiday & Event Labels */
     .event-desc {
       font-size: 0.75rem;
       font-weight: 800;
-      color: #064e3b; /* Dark Green for contrast on thick green background */
+      color: #064e3b;
       line-height: 1.2;
       margin-bottom: 2px;
     }
@@ -147,9 +160,9 @@
       resize: none;
       padding: 3px 5px;
       font-size: 0.75rem;
-      font-weight: 800 !important; /* Thick Bold Text */
-      color: #dc2626 !important;   /* Thick Red Colour */
-      background: rgba(255, 255, 255, 0.7);
+      font-weight: 800 !important;
+      color: #dc2626 !important;
+      background: rgba(255, 255, 255, 0.75);
       line-height: 1.2;
     }
 
@@ -332,6 +345,18 @@
         const panchang = getTeluguPanchang(year, m, d);
         const savedNote = localStorage.getItem(dateKey) || "";
 
+        // Moon Symbol Assignment for Major Days
+        let moonIcon = "";
+        if (panchang.tithi === "Pournami") {
+          moonIcon = `<span class="moon-symbol" title="Pournami (Full Moon)">🌕</span>`;
+        } else if (panchang.tithi === "Amavasya") {
+          moonIcon = `<span class="moon-symbol" title="Amavasya (New Moon)">🌑</span>`;
+        } else if (panchang.tithi === "Ashtami") {
+          moonIcon = `<span class="moon-symbol" title="Ashtami">🌓</span>`;
+        } else if (panchang.tithi === "Navami") {
+          moonIcon = `<span class="moon-symbol" title="Navami">🌔</span>`;
+        }
+
         let cellClass = "day-cell";
         if (isGreenCell) cellClass += " highlight-green";
         if (isToday) cellClass += " active-day";
@@ -340,6 +365,7 @@
           <div class="${cellClass}">
             <div class="cell-top">
               <span class="date-num">${d}</span>
+              ${moonIcon}
             </div>
             ${holidayName ? `<div class="event-desc">${holidayName}</div>` : ''}
             
