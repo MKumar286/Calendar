@@ -44,6 +44,19 @@
       cursor: pointer;
     }
 
+    /* Auto-Save Indicator Badge */
+    .save-status {
+      margin-left: auto;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      transition: opacity 0.2s ease;
+    }
+
     /* Main Calendar Container with Vertical Scrollbar */
     .calendar-container {
       flex-grow: 1;
@@ -191,13 +204,15 @@
 
       .filter-bar {
         padding: 6px 10px;
-        gap: 10px;
+        gap: 8px;
         justify-content: space-between;
       }
 
       .filter-group { gap: 4px; }
       .filter-label { font-size: 0.8rem; }
       select { font-size: 0.8rem; padding: 4px 8px; }
+
+      .save-status { font-size: 0.7rem; padding: 2px 5px; }
 
       .month-title { font-size: 1.05rem; }
       .samvatsara-info { font-size: 0.68rem; padding: 2px 6px; }
@@ -238,7 +253,7 @@
 </head>
 <body>
 
-  <!-- Controls: Year & Month -->
+  <!-- Controls: Year, Month & Auto-Save Indicator -->
   <div class="filter-bar">
     <div class="filter-group">
       <span class="filter-label">Year:</span>
@@ -265,6 +280,8 @@
         <option value="11">December</option>
       </select>
     </div>
+
+    <span class="save-status" id="saveIndicator">Auto-Saved ✓</span>
   </div>
 
   <!-- Scrollable Calendar Grid Container -->
@@ -408,10 +425,7 @@
         }
 
         let cellClass = "day-cell";
-        if (isGreenCell) {
-          cellClass += " highlight-green";
-        }
-        
+        if (isGreenCell) cellClass += " highlight-green";
         if (isToday) cellClass += " active-day";
 
         monthHtml += `
@@ -440,10 +454,20 @@
 
       container.innerHTML = monthHtml;
 
+      // Real-time Auto-Save Engine
+      const indicator = document.getElementById("saveIndicator");
       document.querySelectorAll(".day-note").forEach(textarea => {
         textarea.addEventListener("input", (e) => {
           const key = e.target.getAttribute("data-key");
           localStorage.setItem(key, e.target.value);
+          
+          indicator.textContent = "Saving...";
+          indicator.style.color = "#facc15";
+          
+          setTimeout(() => {
+            indicator.textContent = "Auto-Saved ✓";
+            indicator.style.color = "#4ade80";
+          }, 300);
         });
       });
     }
