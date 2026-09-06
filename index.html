@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 Daily Updates Calendar</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+    
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { margin: 0 0 10px 0; color: #1a365d; }
+    
+    .controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+    select { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; background: #fff; cursor: pointer; }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .day-header {
+      background: #1e293b;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      font-weight: 600;
+      border-radius: 6px;
+    }
+    
+    .day-cell {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      min-height: 120px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .day-cell.empty { background: transparent; border: none; box-shadow: none; }
+    
+    .date-number { font-weight: bold; font-size: 0.9rem; color: #475569; margin-bottom: 6px; }
+    
+    .daily-input {
+      width: 100%;
+      flex-grow: 1;
+      border: 1px solid #f1f5f9;
+      border-radius: 4px;
+      resize: none;
+      padding: 6px;
+      font-size: 0.85rem;
+      background: #fafafa;
+    }
+    
+    .daily-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .calendar-grid { grid-template-columns: repeat(7, minmax(40px, 1fr)); gap: 4px; }
+      .day-cell { min-height: 80px; padding: 4px; }
+      .date-number { font-size: 0.75rem; }
+      .daily-input { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>2026 Planner & Daily Updates</h1>
+    <div class="controls">
+      <label for="monthSelect">Select Month:</label>
+      <select id="monthSelect" onchange="renderCalendar()"></select>
+    </div>
+  </header>
+
+  <div class="calendar-grid" id="calendar"></div>
+
+  <script>
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const monthSelect = document.getElementById("monthSelect");
+    const calendar = document.getElementById("calendar");
+
+    // Populate month dropdown
+    months.forEach((month, index) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.textContent = month;
+      monthSelect.appendChild(option);
+    });
+
+    // Default to current month or January
+    const currentMonth = new Date().getFullYear() === 2026 ? new Date().getMonth() : 0;
+    monthSelect.value = currentMonth;
+
+    function renderCalendar() {
+      calendar.innerHTML = "";
+      const selectedMonth = parseInt(monthSelect.value);
+      
+      // Render weekday headers
+      daysOfWeek.forEach(day => {
+        const header = document.createElement("div");
+        header.className = "day-header";
+        header.textContent = day;
+        calendar.appendChild(header);
+      });
+
+      const firstDay = new Date(2026, selectedMonth, 1).getDay();
+      const daysInMonth = new Date(2026, selectedMonth + 1, 0).getDate();
+
+      // Empty slots before month starts
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "day-cell empty";
+        calendar.appendChild(emptyCell);
+      }
+
+      // Render days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = `2026-${selectedMonth + 1}-${day}`;
+        const savedNote = localStorage.getItem(dateKey) || "";
+
+        const cell = document.createElement("div");
+        cell.className = "day-cell";
+
+        cell.innerHTML = `
+          <div class="date-number">${day}</div>
+          <textarea class="daily-input" placeholder="Add update..." data-key="${dateKey}">${savedNote}</textarea>
+        `;
+
+        calendar.appendChild(cell);
+      }
+
+      // Save content on change
+      document.querySelectorAll(".daily-input").forEach(input => {
+        input.addEventListener("input", (e) => {
+          const key = e.target.getAttribute("data-key");
+          localStorage.setItem(key, e.target.value);
+        });
+      });
+    }
+
+    renderCalendar();
+  </script>
+</body>
+</html>
