@@ -1,322 +1,700 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="te">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 JNTUH & Telugu Calendar</title>
+  <title>తెలుగు క్యాలెండర్ 2026 – 2027 | Telangana & JNTUH Planner</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f1f5f9; color: #1e293b; padding: 10px; height: 100vh; display: flex; flex-direction: column; }
-    
-    header { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; margin-bottom: 8px; background: #fff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    h1 { font-size: 1.1rem; color: #0f172a; font-weight: 700; }
-    
-    .controls { display: flex; align-items: center; gap: 8px; }
-    select { padding: 4px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff; cursor: pointer; font-weight: 600; }
-    
-    .calendar-container { flex-grow: 1; display: flex; flex-direction: column; max-height: calc(100vh - 60px); }
-    
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: auto repeat(6, 1fr);
-      gap: 6px;
-      height: 100%;
-    }
-    
-    .day-header {
-      background: #0f172a;
-      color: #fff;
-      text-align: center;
-      padding: 6px;
-      font-weight: 600;
-      font-size: 0.75rem;
-      border-radius: 8px;
-    }
-    
-    /* Square curved corner boxes */
-    .day-cell {
-      background: #ffffff;
-      border-radius: 14px; /* Curved corners */
-      border: 2px solid #cbd5e1;
-      padding: 5px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      aspect-ratio: 1 / 0.95; /* Keeps box shapes square and balanced */
-    }
-    
-    .day-cell.empty { background: transparent; border: none; }
-    
-    /* Thick Vibrant Green background for Sundays & Holidays */
-    .day-cell.highlight-thick-green {
-      background-color: #16a34a !important; /* Thick Green */
-      border-color: #15803d !important;
-      color: #ffffff !important;
+    :root {
+      --bg-primary: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      
+      /* Legend Colors */
+      --color-govt: #ef4444;       /* 🔴 Red - Govt Holiday */
+      --bg-govt: #fee2e2;
+      --color-optional: #f97316;   /* 🟠 Orange - Optional */
+      --bg-optional: #ffedd5;
+      --color-jntuh: #10b981;      /* 🟢 Green - JNTUH */
+      --bg-jntuh: #d1fae5;
+      --color-festival: #3b82f6;   /* 🔵 Blue - Festival */
+      --bg-festival: #dbeafe;
+      --color-cultural: #8b5cf6;   /* 🟣 Purple - Religious/Cultural */
+      --bg-cultural: #f3e8ff;
+      --color-national: #475569;   /* ⚫ Grey - National/International */
+      --bg-national: #f1f5f9;
+      --bg-sunday: #fff1f2;
+      --color-sunday: #be123c;
     }
 
-    /* Adjusted date numbers on green background */
-    .day-cell.highlight-thick-green .date-number {
-      color: #ffffff !important;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, 'Gidugu', 'Mandali', sans-serif; }
+    body { background-color: var(--bg-primary); color: var(--text-main); padding: 15px; line-height: 1.4; }
+
+    /* Layout & Navigation Controls */
+    .app-header {
+      background: linear-gradient(135deg, #1e3a8a, #0f172a);
+      color: #fff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
-    .cell-top {
+
+    .app-title h1 { font-size: 1.4rem; font-weight: 800; color: #fbbf24; }
+    .app-title h2 { font-size: 0.95rem; font-weight: 500; color: #e2e8f0; }
+
+    .nav-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .nav-btn, select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    select option { background: #0f172a; color: #fff; }
+    .btn-action { background: #fbbf24; color: #0f172a; border: none; }
+    .btn-action:hover { background: #f59e0b; }
+
+    /* Legend Box */
+    .legend-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .legend-title { font-size: 0.8rem; font-weight: 800; color: #0f172a; margin-right: 4px; }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    /* Main View Area */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* Cover Page Styling */
+    .cover-card {
+      background: linear-gradient(135deg, #fffbe3 0%, #fff 100%);
+      border: 3px solid #fbbf24;
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover-title { font-size: 2.2rem; color: #9a3412; font-weight: 800; margin-bottom: 8px; }
+    .cover-subtitle { font-size: 1.4rem; color: #1e3a8a; font-weight: 700; margin-bottom: 12px; }
+    .cover-desc { font-size: 0.95rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 24px; }
+    .cover-badge-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+    .cover-badge { background: #fef3c7; color: #78350f; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+    /* Month Card Layout */
+    .month-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .month-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      line-height: 1;
-      margin-bottom: 3px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 10px;
+    }
+    .month-title-te { font-size: 1.2rem; font-weight: 800; color: #1e3a8a; }
+    .month-title-en { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .samvatsara-info { font-size: 0.75rem; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
     }
 
-    .date-number { font-weight: 800; font-size: 0.85rem; color: #0f172a; }
-    
-    .holiday-badge {
-      font-size: 0.58rem;
-      background-color: #ffffff;
-      color: #15803d;
-      padding: 1px 4px;
-      border-radius: 6px;
+    .grid-header {
+      background: #0f172a;
+      color: #fff;
+      text-align: center;
+      padding: 6px 2px;
+      font-size: 0.72rem;
       font-weight: 700;
+      border-radius: 4px;
+    }
+
+    .day-cell {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      min-height: 85px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .day-cell.empty { background: transparent; border: none; }
+    .day-cell.sunday { background: var(--bg-sunday); }
+
+    /* Highlighted Holiday Boxes */
+    .day-cell.is-govt { background-color: var(--bg-govt) !important; border-color: var(--color-govt); }
+    .day-cell.is-jntuh { background-color: var(--bg-jntuh) !important; border-color: var(--color-jntuh); }
+    .day-cell.is-optional { background-color: var(--bg-optional) !important; border-color: var(--color-optional); }
+    .day-cell.is-festival { background-color: var(--bg-festival) !important; border-color: var(--color-festival); }
+
+    .cell-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+    .date-num { font-size: 0.85rem; font-weight: 800; color: #0f172a; }
+    .day-cell.sunday .date-num { color: var(--color-sunday); }
+
+    .holiday-badge {
+      font-size: 0.55rem;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: 700;
+      line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 75%;
     }
+    .badge-govt { background: var(--color-govt); color: #fff; }
+    .badge-jntuh { background: var(--color-jntuh); color: #fff; }
+    .badge-optional { background: var(--color-optional); color: #fff; }
+    .badge-festival { background: var(--color-festival); color: #fff; }
 
-    .tithi-badge {
-      font-size: 0.6rem;
-      color: #78350f;
-      background-color: #fef3c7;
-      border: 1px solid #fde68a;
-      padding: 1px 4px;
-      border-radius: 6px;
-      font-weight: 600;
-      margin-bottom: 3px;
+    .event-desc {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 2px;
+      line-height: 1.15;
+    }
+
+    .panchang-mini {
+      font-size: 0.55rem;
+      color: #64748b;
+      margin-top: auto;
+      border-top: 1px dotted #cbd5e1;
+      padding-top: 2px;
       line-height: 1.1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    /* Tithi badge adjusted when on thick green cell */
-    .day-cell.highlight-thick-green .tithi-badge {
-      background-color: #fef08a;
-      border-color: #fde047;
-      color: #713f12;
-    }
-    
-    .daily-input {
-      width: 100%;
-      flex-grow: 1;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px; /* Curved textarea corners */
-      resize: none;
-      padding: 3px 5px;
+    /* College Information Panel */
+    .college-panel {
+      margin-top: 10px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 10px;
       font-size: 0.72rem;
-      background: rgba(255, 255, 255, 0.95);
-      color: #0f172a;
-      line-height: 1.2;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
     }
+    .college-panel strong { color: #0f172a; }
 
-    .day-cell.highlight-thick-green .daily-input {
-      border-color: #86efac;
-      background: rgba(255, 255, 255, 0.9);
+    /* Tables & Summaries */
+    .summary-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      margin-bottom: 20px;
     }
-    
-    .daily-input:focus {
-      outline: none;
-      border-color: #0f172a;
-      background: #fff;
+    .summary-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left; }
+    th, td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f1f5f9; color: #0f172a; font-weight: 700; }
+
+    /* Year at a Glance Grid */
+    .at-a-glance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .mini-month { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; }
+    .mini-month-title { font-size: 0.8rem; font-weight: 800; text-align: center; color: #1e3a8a; margin-bottom: 4px; }
+    .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.6rem; }
+    .mini-day { padding: 2px; border-radius: 2px; }
+    .mini-day.has-event { font-weight: 800; background: #dbeafe; }
+    .mini-day.is-govt-holiday { background: var(--bg-govt); color: var(--color-govt); font-weight: bold; }
+
+    /* Print Styles */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .app-header, .nav-controls, .btn-action { display: none !important; }
+      .month-card, .summary-card, .cover-card { break-inside: avoid; border: 1px solid #000; box-shadow: none; margin-bottom: 15px; }
+      .day-cell { min-height: 70px; border: 1px solid #94a3b8; }
+      .view-section { display: block !important; }
     }
 
     @media (max-width: 768px) {
-      body { padding: 4px; }
-      .day-cell { border-radius: 10px; padding: 3px; }
-      .date-number { font-size: 0.7rem; }
-      .holiday-badge, .tithi-badge { font-size: 0.52rem; }
-      .daily-input { font-size: 0.65rem; border-radius: 6px; }
+      .day-cell { min-height: 65px; padding: 2px; }
+      .date-num { font-size: 0.75rem; }
+      .event-desc { font-size: 0.55rem; }
+      .panchang-mini { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>2026 JNTUH & Telugu Planner</h1>
-    <div class="controls">
-      <label for="monthSelect" style="font-size: 0.85rem; font-weight: 600;">Month:</label>
-      <select id="monthSelect" onchange="renderCalendar()"></select>
+  <!-- Application Header -->
+  <header class="app-header">
+    <div class="app-title">
+      <h1>తెలుగు క్యాలెండర్ 2026 – 2027</h1>
+      <h2>తెలంగాణ ప్రభుత్వ సెలవులు | JNTUH అకాడమిక్ ప్లానర్ | పంచాంగం</h2>
+    </div>
+    <div class="nav-controls">
+      <select id="viewSelect" onchange="switchView(this.value)">
+        <option value="cover">అట్ట పేజీ (Cover)</option>
+        <option value="y2026">2026 నెలలవారీ క్యాలెండర్</option>
+        <option value="glance2026">2026 వార్షిక చూపు (At a Glance)</option>
+        <option value="y2027">2027 నెలలవారీ క్యాలెండర్</option>
+        <option value="glance2027">2027 వార్షిక చూపు (At a Glance)</option>
+        <option value="holidays">సెలవుల జాబితా (Holidays)</option>
+        <option value="academic">JNTUH అకాడమిక్ ప్లానర్</option>
+      </select>
+      <button class="nav-btn btn-action" onclick="window.print()">🖨️ Print / PDF</button>
     </div>
   </header>
 
-  <div class="calendar-container">
-    <div class="calendar-grid" id="calendar"></div>
+  <!-- Color Legend -->
+  <div class="legend-card">
+    <span class="legend-title">సూచిక (Color Legend):</span>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-govt);"></span> 🔴 ప్రభుత్వ సెలవు (Govt)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-optional);"></span> 🟠 ఐచ్ఛిక సెలవు (Optional)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-jntuh);"></span> 🟢 JNTUH సెలవు / Vacation</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-festival);"></span> 🔵 పండుగ (Major Festival)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-cultural);"></span> 🟣 సాంస్కృతిక / పర్వదినం</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--color-national);"></span> ⚫ జాతీయ దినోత్సవం</div>
   </div>
 
+  <!-- VIEW: COVER PAGE -->
+  <section id="view-cover" class="view-section active">
+    <div class="cover-card">
+      <div style="font-size: 2.5rem; margin-bottom: 10px;">🪔 🏛️ 🌴</div>
+      <h1 class="cover-title">తెలుగు క్యాలెండర్ 2026 – 2027</h1>
+      <h2 class="cover-subtitle">శ్రీ క్రోధి నామ సంవత్సరం / శ్రీ విశ్వావసు నామ సంవత్సరం</h2>
+      <p class="cover-desc">
+        తెలంగాణ రాష్ట్ర ప్రభుత్వ అధికారిక సెలవులు, JNTUH కళాశాల అకాడమిక్ షెడ్యూల్, పరీక్షా తేదీలు, ముఖ్యమైన పండుగలు మరియు సంపూర్ణ దినచర్య ప్లానర్.
+      </p>
+      <div class="cover-badge-group">
+        <span class="cover-badge">ప్రభుత్వ సెలవులు</span>
+        <span class="cover-badge">JNTUH Academic Break</span>
+        <span class="cover-badge">తిథి / నక్షత్రం</span>
+        <span class="cover-badge">దీర్ఘ వారాంతాలు (Long Weekends)</span>
+      </div>
+      <div style="margin-top: 30px;">
+        <button class="nav-btn btn-action" style="padding: 10px 20px; font-size: 1rem;" onclick="switchView('y2026')">2026 క్యాలెండర్ ప్రారంభించండి ➔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW: 2026 MONTHLY -->
+  <section id="view-y2026" class="view-section">
+    <div id="container-2026"></div>
+  </section>
+
+  <!-- VIEW: 2026 AT A GLANCE -->
+  <section id="view-glance2026" class="view-section">
+    <div class="summary-card">
+      <div class="summary-title">📅 2026 – వార్షిక చూపు (Year at a Glance)</div>
+      <div class="at-a-glance-grid" id="glance-2026-grid"></div>
+    </div>
+  </section>
+
+  <!-- VIEW: 2027 MONTHLY -->
+  <section id="view-y2027" class="view-section">
+    <div id="container-2027"></div>
+  </section>
+
+  <!-- VIEW: 2027 AT A GLANCE -->
+  <section id="view-glance2027" class="view-section">
+    <div class="summary-card">
+      <div class="summary-title">📅 2027 – వార్షిక చూపు (Year at a Glance)</div>
+      <p style="font-size: 0.8rem; color: #b91c1c; margin-bottom: 10px; font-weight: bold;">* Note: 2027 Government and JNTUH dates are based on standard academic patterns. Official notification awaited.</p>
+      <div class="at-a-glance-grid" id="glance-2027-grid"></div>
+    </div>
+  </section>
+
+  <!-- VIEW: HOLIDAYS SUMMARY -->
+  <section id="view-holidays" class="view-section">
+    <div class="summary-card">
+      <div class="summary-title">🔴 తెలంగాణ ప్రభుత్వ & JNTUH సెలవుల పట్టిక (2026)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>తేదీ</th>
+            <th>వారం</th>
+            <th>పండుగ / సెలవు పేరు</th>
+            <th>సెలవు రకం</th>
+          </tr>
+        </thead>
+        <tbody id="holiday-table-2026"></tbody>
+      </table>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">🏖️ దీర్ఘ వారాంతపు సెలవులు (Long Weekends 2026)</div>
+      <div id="long-weekends-2026"></div>
+    </div>
+  </section>
+
+  <!-- VIEW: ACADEMIC PLANNER -->
+  <section id="view-academic" class="view-section">
+    <div class="summary-card">
+      <div class="summary-title">🎓 JNTUH అకాడమిక్ ప్లానర్ (Academic & Exam Calendar)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>కార్యక్రమం / ఈవెంట్</th>
+            <th>కాలవ్యవధి / తేదీ</th>
+            <th>వర్గము</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sankranti Vacation 2026</td>
+            <td>12 Jan 2026 – 17 Jan 2026</td>
+            <td><span class="holiday-badge badge-jntuh">JNTUH Break</span></td>
+          </tr>
+          <tr>
+            <td>B.Tech / B.Pharm Mid-I Exams (Even Sem)</td>
+            <td>March 2026 (2nd Week)</td>
+            <td>Exam Period</td>
+          </tr>
+          <tr>
+            <td>Summer Vacation / Industrial Training</td>
+            <td>11 May 2026 – 20 Jun 2026</td>
+            <td><span class="holiday-badge badge-jntuh">Summer Break</span></td>
+          </tr>
+          <tr>
+            <td>Commencement of Odd Semester (2026-27)</td>
+            <td>22 June 2026</td>
+            <td>Academic Start</td>
+          </tr>
+          <tr>
+            <td>Dasara Vacation 2026</td>
+            <td>12 Oct 2026 – 17 Oct 2026</td>
+            <td><span class="holiday-badge badge-jntuh">Dasara Vacation</span></td>
+          </tr>
+          <tr>
+            <td>End Semester Examinations (Odd Sem)</td>
+            <td>Nov / Dec 2026</td>
+            <td>Exam Period</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <script>
-    const months = [
+    // --- DATA STRUCTURES ---
+
+    const weekDaysTe = ["ఆది", "సోమ", "మంగళ", "బుధ", "గురు", "శుక్ర", "శని"];
+
+    const holidaysData2026 = {
+      "1-1": { name: "న్యూ ఇయర్", type: "national", badge: "New Year" },
+      "1-13": { name: "భోగి", type: "festival", badge: "Bhogi" },
+      "1-14": { name: "సంక్రాంతి / పొంగల్", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "1-15": { name: "కనుమ", type: "optional", badge: "ఐచ్ఛిక సెలవు" },
+      "1-26": { name: "రిపబ్లిక్ డే", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "2-15": { name: "మహా శివరాత్రి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "3-3": { name: "హోళీ", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "3-19": { name: "ఉగాది (శ్రీ విశ్వావసు)", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "3-21": "Ramzan (Id-ul-Fitr)",
+      "3-21": { name: "రంజాన్ (ఈద్-ఉల్-ఫితర్)", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "3-27": { name: "శ్రీరామ నవమి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "4-3": { name: "గుడ్ ఫ్రైడే", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "4-14": { name: "డా. అంబేడ్కర్ జయంతి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "4-19": { name: "అక్షయ తృతీయ", type: "cultural", badge: "పర్వదినం" },
+      "5-1": { name: "మే డే / కార్మిక దినోత్సవం", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "5-27": { name: "బక్రీద్ (ఈద్-ఉల్-అజ్హా)", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "6-2": { name: "తెలంగాణ అవతరణ దినోత్సవం", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "6-25": { name: "మొహర్రం", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "7-20": { name: "బోనాలు", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "8-15": { name: "స్వాతంత్య్ర దినోత్సవం", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "8-25": { name: "మిలాద్-ఉన్-నబి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "8-28": { name: "వరలక్ష్మీ వ్రతం", type: "cultural", badge: "పర్వదినం" },
+      "9-4": { name: "శ్రీకృష్ణ జన్మాష్టమి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "9-14": { name: "వినాయక చవితి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "10-2": { name: "గాంధీ జయంతి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "10-12": { name: "బతుకమ్మ ప్రారంభం", type: "cultural", badge: "తెలంగాణ పండుగ" },
+      "10-19": { name: "దుర్గాష్టమి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "10-20": { name: "విజయదశమి / దసరా", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "11-8": { name: "దీపావళి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "11-24": { name: "కార్తీక పౌర్ణమి / గురునానక్ జయంతి", type: "govt", badge: "ప్రభుత్వ సెలవు" },
+      "12-25": { name: "క్రిస్మస్", type: "govt", badge: "ప్రభుత్వ సెలవు" }
+    };
+
+    // JNTUH Vacation Blocks 2026
+    const jntuhVacations2026 = [
+      { start: "1-12", end: "1-17", label: "సంక్రాంతి సెలవులు (JNTUH)" },
+      { start: "5-11", end: "6-20", label: "వేసవి సెలవులు (Summer Vacation)" },
+      { start: "10-12", end: "10-17", label: "దసరా సెలవులు (JNTUH)" }
+    ];
+
+    // Selected Tithi/Panchang markers
+    const tithiData2026 = {
+      "1-3": "పౌర్ణమి", "1-18": "అమావాస్య",
+      "2-1": "పౌర్ణమి", "2-17": "అమావాస్య",
+      "3-3": "పౌర్ణమి", "3-18": "అమావాస్య",
+      "4-2": "పౌర్ణమి", "4-17": "అమావాస్య",
+      "5-1": "పౌర్ణమి", "5-16": "అమావాస్య",
+      "6-29": "పౌర్ణమి", "6-15": "అమావాస్య",
+      "7-29": "పౌర్ణమి", "7-14": "అమావాస్య",
+      "8-27": "పౌర్ణమి", "8-13": "అమావాస్య",
+      "9-25": "పౌర్ణమి", "9-11": "అమావాస్య",
+      "10-25": "పౌర్ణమి", "10-11": "అమావాస్య",
+      "11-24": "పౌర్ణమి", "11-10": "అమావాస్య",
+      "12-23": "పౌర్ణమి", "12-9": "అమావాస్య"
+    };
+
+    const monthNamesTe = [
+      "జనవరి", "ఫిబ్రవరి", "మార్చి", "ఏప్రిల్", "మే", "జూన్",
+      "జూలై", "ఆగస్టు", "సెప్టెంబర్", "అక్టోబర్", "నవంబర్", "డిసెంబర్"
+    ];
+
+    const monthNamesEn = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
 
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    // --- HELPER FUNCTIONS ---
 
-    // Government & JNTUH Holidays
-    const holidays2026 = {
-      "1-1": "New Year",
-      "1-14": "Bhogi / Sankranti Vac.",
-      "1-15": "Sankranti / Kanuma",
-      "1-26": "Republic Day",
-      "2-15": "Maha Shivaratri",
-      "3-3": "Holi",
-      "3-19": "Ugadi",
-      "3-21": "Ramzan (Id-ul-Fitr)",
-      "3-27": "Sri Rama Navami",
-      "3-31": "Mahavir Jayanti",
-      "4-3": "Good Friday",
-      "4-14": "Dr. Ambedkar Jayanti",
-      "5-1": "May Day",
-      "5-27": "Bakrid",
-      "6-25": "Muharram",
-      "7-20": "Bonalu",
-      "8-15": "Independence Day",
-      "8-25": "Milad-un-Nabi",
-      "9-4": "Sri Krishnashtami",
-      "9-14": "Vinayaka Chavithi",
-      "10-2": "Gandhi Jayanti",
-      "10-12": "Bathukamma Vac.",
-      "10-19": "Durgashtami",
-      "10-20": "Vijayadasami",
-      "11-8": "Deepavali",
-      "11-24": "Guru Nanak Jayanti",
-      "12-25": "Christmas"
-    };
-
-    // Telugu Tithi Timings
-    const teluguTithis2026 = {
-      "1-3": "Pournami (till 3:12 PM)",
-      "1-18": "Amavasya (till 11:45 AM)",
-      "2-1": "Pournami (till 5:40 AM Feb 2)",
-      "2-17": "Amavasya (till 5:31 PM)",
-      "3-3": "Pournami (till 7:08 PM)",
-      "3-18": "Amavasya (till 11:53 PM)",
-      "4-2": "Pournami (till 7:42 AM)",
-      "4-17": "Amavasya (till 7:22 AM)",
-      "5-1": "Pournami (till 7:09 PM)",
-      "5-16": "Amavasya (till 4:31 PM)",
-      "5-31": "Pournami (till 5:15 AM Jun 1)",
-      "6-15": "Amavasya (till 3:20 AM Jun 16)",
-      "6-29": "Pournami (till 2:38 PM)",
-      "7-14": "Amavasya (till 3:45 PM)",
-      "7-29": "Pournami (till 11:10 PM)",
-      "8-13": "Amavasya (till 6:10 AM Aug 14)",
-      "8-27": "Pournami (till 9:18 AM)",
-      "9-11": "Amavasya (till 10:15 PM)",
-      "9-25": "Pournami (till 9:20 PM)",
-      "10-11": "Amavasya (till 3:40 PM)",
-      "10-25": "Pournami (till 11:12 AM)",
-      "11-10": "Amavasya (till 9:15 AM)",
-      "11-24": "Pournami (till 2:40 AM Nov 25)",
-      "12-9": "Amavasya (till 1:40 AM Dec 10)",
-      "12-23": "Pournami (till 6:44 PM)"
-    };
-
-    const monthSelect = document.getElementById("monthSelect");
-    const calendar = document.getElementById("calendar");
-
-    months.forEach((month, index) => {
-      const option = document.createElement("option");
-      option.value = index;
-      option.textContent = month;
-      monthSelect.appendChild(option);
-    });
-
-    const currentMonth = new Date().getFullYear() === 2026 ? new Date().getMonth() : 0;
-    monthSelect.value = currentMonth;
-
-    function renderCalendar() {
-      calendar.innerHTML = "";
-      const selectedMonth = parseInt(monthSelect.value);
-      
-      daysOfWeek.forEach(day => {
-        const header = document.createElement("div");
-        header.className = "day-header";
-        header.textContent = day;
-        calendar.appendChild(header);
-      });
-
-      const firstDay = new Date(2026, selectedMonth, 1).getDay();
-      const daysInMonth = new Date(2026, selectedMonth + 1, 0).getDate();
-
-      for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement("div");
-        emptyCell.className = "day-cell empty";
-        calendar.appendChild(emptyCell);
-      }
-
-      let saturdayCount = 0;
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateObj = new Date(2026, selectedMonth, day);
-        const dayOfWeek = dateObj.getDay();
-        const dateKey = `2026-${selectedMonth + 1}-${day}`;
-        const monthDayKey = `${selectedMonth + 1}-${day}`;
-        
-        let isSunday = (dayOfWeek === 0);
-        let isJntuhSaturdayHoliday = false;
-
-        if (dayOfWeek === 6) {
-          saturdayCount++;
-          if (saturdayCount === 2 || saturdayCount === 4) {
-            isJntuhSaturdayHoliday = true;
-          }
-        }
-
-        let holidayReason = holidays2026[monthDayKey] || "";
-        if (isJntuhSaturdayHoliday) {
-          holidayReason = saturdayCount === 2 ? "2nd Saturday" : "4th Saturday";
-        }
-
-        const isHoliday = isSunday || Boolean(holidayReason);
-        const tithiInfo = teluguTithis2026[monthDayKey] || "";
-
-        const cell = document.createElement("div");
-        cell.className = "day-cell";
-
-        // Whole box highlighted in thick green for Sundays & Holidays
-        if (isHoliday) {
-          cell.classList.add("highlight-thick-green");
-        }
-
-        let badgeText = "";
-        if (holidayReason) {
-          badgeText = holidayReason;
-        } else if (isSunday) {
-          badgeText = "Sunday";
-        }
-
-        const savedNote = localStorage.getItem(dateKey) || "";
-
-        cell.innerHTML = `
-          <div class="cell-top">
-            <span class="date-number">${day}</span>
-            ${badgeText ? `<span class="holiday-badge" title="${badgeText}">${badgeText}</span>` : ""}
-          </div>
-          ${tithiInfo ? `<div class="tithi-badge" title="${tithiInfo}">🌕 ${tithiInfo}</div>` : ""}
-          <textarea class="daily-input" placeholder="Update..." data-key="${dateKey}">${savedNote}</textarea>
-        `;
-
-        calendar.appendChild(cell);
-      }
-
-      document.querySelectorAll(".daily-input").forEach(input => {
-        input.addEventListener("input", (e) => {
-          const key = e.target.getAttribute("data-key");
-          localStorage.setItem(key, e.target.value);
-        });
-      });
+    function isDateInRange(m, d, startStr, endStr) {
+      const [sM, sD] = startStr.split('-').map(Number);
+      const [eM, eD] = endStr.split('-').map(Number);
+      if (m < sM || m > eM) return false;
+      if (m === sM && d < sD) return false;
+      if (m === eM && d > eD) return false;
+      return true;
     }
 
-    renderCalendar();
+    function checkJntuhVacation(m, d, year) {
+      if (year !== 2026) return null;
+      for (let vac of jntuhVacations2026) {
+        if (isDateInRange(m, d, vac.start, vac.end)) {
+          return vac.label;
+        }
+      }
+      return null;
+    }
+
+    // --- RENDER MONTHLY CALENDAR ---
+
+    function renderYearCalendar(year, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      for (let m = 0; m < 12; m++) {
+        const firstDay = new Date(year, m, 1).getDay();
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+        
+        // Count 2nd & 4th Saturdays
+        let satCount = 0;
+
+        let monthHtml = `
+          <div class="month-card">
+            <div class="month-header">
+              <div>
+                <span class="month-title-te">${monthNamesTe[m]}</span>
+                <span class="month-title-en"> – ${monthNamesEn[m]} ${year}</span>
+              </div>
+              <div class="samvatsara-info">${year === 2026 ? 'శ్రీ క్రోధి / శ్రీ విశ్వావసు' : 'శ్రీ విశ్వావసు నామ సంవత్సరం'}</div>
+            </div>
+            <div class="calendar-grid">
+        `;
+
+        // Render Weekday Headers
+        weekDaysTe.forEach(w => {
+          monthHtml += `<div class="grid-header">${w}</div>`;
+        });
+
+        // Empty padding cells
+        for (let i = 0; i < firstDay; i++) {
+          monthHtml += `<div class="day-cell empty"></div>`;
+        }
+
+        // Render Days
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateObj = new Date(year, m, d);
+          const dayOfWeek = dateObj.getDay();
+          const dateKey = `${m + 1}-${d}`;
+
+          let isSunday = (dayOfWeek === 0);
+          let isSaturday = (dayOfWeek === 6);
+          let jntuhSatLabel = "";
+
+          if (isSaturday) {
+            satCount++;
+            if (satCount === 2 || satCount === 4) {
+              jntuhSatLabel = `${satCount}వ శనివారం (JNTUH)`;
+            }
+          }
+
+          const holiday = year === 2026 ? holidaysData2026[dateKey] : null;
+          const jntuhVac = checkJntuhVacation(m + 1, d, year);
+          const tithi = year === 2026 ? tithiData2026[dateKey] : null;
+
+          // Determine Classes for Styling
+          let cellClass = "day-cell";
+          if (isSunday) cellClass += " sunday";
+          
+          let badgeHtml = "";
+          let descText = "";
+
+          if (holiday) {
+            cellClass += ` is-${holiday.type}`;
+            badgeHtml = `<span class="holiday-badge badge-${holiday.type}">${holiday.badge}</span>`;
+            descText = holiday.name;
+          } else if (jntuhSatLabel && year === 2026) {
+            cellClass += " is-jntuh";
+            badgeHtml = `<span class="holiday-badge badge-jntuh">JNTUH</span>`;
+            descText = jntuhSatLabel;
+          } else if (jntuhVac) {
+            cellClass += " is-jntuh";
+            badgeHtml = `<span class="holiday-badge badge-jntuh">JNTUH Vacation</span>`;
+            descText = jntuhVac;
+          }
+
+          monthHtml += `
+            <div class="${cellClass}">
+              <div class="cell-top">
+                <span class="date-num">${d}</span>
+                ${badgeHtml}
+              </div>
+              ${descText ? `<div class="event-desc">${descText}</div>` : ''}
+              ${tithi ? `<div class="panchang-mini">🌕 ${tithi}</div>` : ''}
+            </div>
+          `;
+        }
+
+        monthHtml += `</div>`; // Close grid
+
+        // College Academic Info Footer
+        monthHtml += `
+          <div class="college-panel">
+            <div><strong>JNTUH సమాచారం:</strong> ${year === 2026 ? (m === 0 ? 'సంక్రాంతి సెలవులు (12-17)' : m === 4 ? 'వేసవి సెలవులు ప్రారంభం' : m === 9 ? 'దసరా సెలవులు' : 'సాధారణ పని దినాలు') : 'అకాడమిక్ క్యాలెండర్ ప్రకారం'}</div>
+            <div><strong>పనిదినాలు:</strong> ~22 Days</div>
+          </div>
+        </div>`;
+
+        container.innerHTML += monthHtml;
+      }
+    }
+
+    // --- RENDER AT A GLANCE GRID ---
+
+    function renderGlanceGrid(year, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      for (let m = 0; m < 12; m++) {
+        const firstDay = new Date(year, m, 1).getDay();
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+        let html = `
+          <div class="mini-month">
+            <div class="mini-month-title">${monthNamesTe[m]} (${monthNamesEn[m]})</div>
+            <div class="mini-grid">
+              <div style="font-weight:bold; color:red;">ఆది</div><div>సోమ</div><div>మంగళ</div><div>బుధ</div><div>గురు</div><div>శుక్ర</div><div>శని</div>
+        `;
+
+        for (let i = 0; i < firstDay; i++) {
+          html += `<div></div>`;
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateKey = `${m + 1}-${d}`;
+          const isGovt = year === 2026 && holidaysData2026[dateKey] && holidaysData2026[dateKey].type === 'govt';
+          const hasEvent = year === 2026 && holidaysData2026[dateKey];
+          
+          let cls = "mini-day";
+          if (isGovt) cls += " is-govt-holiday";
+          else if (hasEvent) cls += " has-event";
+
+          html += `<div class="${cls}">${d}</div>`;
+        }
+
+        html += `</div></div>`;
+        container.innerHTML += html;
+      }
+    }
+
+    // --- RENDER SUMMARY TABLES ---
+
+    function renderHolidayTable() {
+      const tbody = document.getElementById("holiday-table-2026");
+      tbody.innerHTML = "";
+
+      Object.keys(holidaysData2026).forEach(key => {
+        const [m, d] = key.split('-').map(Number);
+        const dateObj = new Date(2026, m - 1, d);
+        const dayName = weekDaysTe[dateObj.getDay()];
+        const item = holidaysData2026[key];
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d} ${monthNamesTe[m - 1]} 2026</td>
+          <td>${dayName}</td>
+          <td><strong>${item.name}</strong></td>
+          <td><span class="holiday-badge badge-${item.type}">${item.badge}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Long Weekends Calculation
+      const lwContainer = document.getElementById("long-weekends-2026");
+      lwContainer.innerHTML = `
+        <ul style="font-size:0.8rem; padding-left: 18px; line-height: 1.6;">
+          <li><strong>జనవరి 13 - 18:</strong> భోగి, సంక్రాంతి, కనుమ & ఆదివారం (6 రోజులు దీర్ఘ సెలవులు - JNTUH)</li>
+          <li><strong>ఏప్రిల్ 3 - 5:</strong> గుడ్ ఫ్రైడే (శుక్రవారం) + శని + ఆదివారం (3 రోజులు)</li>
+          <li><strong>మే 1 - 3:</strong> మే డే (శుక్రవారం) + శని + ఆదివారం (3 రోజులు)</li>
+          <li><strong>అక్టోబర్ 2 - 4:</strong> గాంధీ జయంతి (శుక్రవారం) + శని + ఆదివారం (3 రోజులు)</li>
+          <li><strong>అక్టోబర్ 17 - 20:</strong> దసరా / విజయదశమి సెలవులు (4 రోజులు)</li>
+        </ul>
+      `;
+    }
+
+    // --- NAVIGATION CONTROLLER ---
+
+    function switchView(viewId) {
+      document.querySelectorAll(".view-section").forEach(el => el.classList.remove("active"));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.add("active");
+      document.getElementById("viewSelect").value = viewId;
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      renderYearCalendar(2026, "container-2026");
+      renderYearCalendar(2027, "container-2027");
+      renderGlanceGrid(2026, "glance-2026-grid");
+      renderGlanceGrid(2027, "glance-2027-grid");
+      renderHolidayTable();
+    };
   </script>
 </body>
 </html>
