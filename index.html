@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 – 2027 Desktop Calendar Planner</title>
+  <title>2026 – 2027 Desktop Calendar Planner with Notes</title>
   <style>
     :root {
       --bg-primary: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #0f172a;
-      --text-muted: #64748b;
       --border-color: #cbd5e1;
       
       --bg-govt: #fee2e2;
@@ -36,7 +35,7 @@
       overflow: hidden;
     }
 
-    /* Minimal Top Control Bar */
+    /* Minimal Filter Control Bar */
     .filter-bar {
       display: flex;
       align-items: center;
@@ -63,7 +62,7 @@
       cursor: pointer;
     }
 
-    /* Main Container - Zero Vertical Scroll */
+    /* Zero Vertical Scroll Main Layout */
     .calendar-container {
       flex-grow: 1;
       display: flex;
@@ -73,7 +72,7 @@
 
     .month-card {
       background: var(--card-bg);
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border-color);
       padding: 6px;
       height: 100%;
@@ -99,7 +98,7 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       grid-template-rows: auto repeat(6, 1fr);
-      gap: 4px;
+      gap: 5px;
       flex-grow: 1;
       height: 100%;
     }
@@ -111,14 +110,14 @@
       padding: 4px;
       font-size: 0.75rem;
       font-weight: 700;
-      border-radius: 4px;
+      border-radius: 6px;
     }
 
-    /* Square Curved Day Cells */
+    /* Square Boxes with Curved Corners */
     .day-cell {
       background: #ffffff;
       border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 12px; /* Square Curved Corner Styling */
       padding: 4px;
       display: flex;
       flex-direction: column;
@@ -129,7 +128,7 @@
     .day-cell.empty { background: transparent; border: none; }
     .day-cell.sunday { background: var(--bg-sunday); }
 
-    /* Holiday Styles */
+    /* Holiday Highlight Styles */
     .day-cell.is-govt { background-color: var(--bg-govt) !important; border-color: var(--color-govt) !important; }
     .day-cell.is-jntuh { background-color: var(--bg-jntuh) !important; border-color: var(--color-jntuh) !important; }
     .day-cell.is-optional { background-color: var(--bg-optional) !important; border-color: var(--color-optional) !important; }
@@ -155,9 +154,8 @@
     .badge-optional { background: var(--color-optional); }
     .badge-festival { background: var(--color-festival); }
 
-    /* Tithi Highlights */
     .key-tithi-tag {
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       padding: 1px 3px;
       border-radius: 3px;
       font-weight: 800;
@@ -173,7 +171,7 @@
     .tag-dashami  { background-color: #ccfbf1; color: #115e59; }
 
     .event-desc {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 700;
       color: #1e293b;
       margin-top: 1px;
@@ -183,19 +181,39 @@
       text-overflow: ellipsis;
     }
 
-    /* Panchang Details Footer in Cell */
+    /* Panchang Details Footer */
     .panchang-box {
-      margin-top: auto;
+      margin-top: 2px;
       background: rgba(241, 245, 249, 0.9);
       border-radius: 4px;
       padding: 1px 3px;
-      font-size: 0.55rem;
+      font-size: 0.52rem;
       line-height: 1.1;
       color: #334155;
       border-top: 1px solid #cbd5e1;
     }
     .panchang-masa { font-weight: 700; color: #1e3a8a; }
     .panchang-tithi { font-weight: 600; color: #b45309; }
+
+    /* Daily Input Notes Area */
+    .day-note {
+      width: 100%;
+      flex-grow: 1;
+      margin-top: 2px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      resize: none;
+      padding: 2px 4px;
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.92);
+      color: #0f172a;
+      line-height: 1.15;
+    }
+    .day-note:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      background: #ffffff;
+    }
 
     .college-panel {
       margin-top: 4px;
@@ -212,7 +230,7 @@
 </head>
 <body>
 
-  <!-- Controls: Only Year & Month Filters -->
+  <!-- Controls: Year & Month Filters -->
   <div class="filter-bar">
     <div class="filter-group">
       <span class="filter-label">Year:</span>
@@ -241,7 +259,7 @@
     </div>
   </div>
 
-  <!-- Calendar Container -->
+  <!-- Main Grid Area -->
   <div class="calendar-container" id="calendar-output"></div>
 
   <script>
@@ -369,7 +387,7 @@
       for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(year, m, d);
         const dayOfWeek = dateObj.getDay();
-        const dateKey = `${m + 1}-${d}`;
+        const dateKey = `${year}-${m + 1}-${d}`;
 
         let isSunday = (dayOfWeek === 0);
         let isSaturday = (dayOfWeek === 6);
@@ -382,9 +400,10 @@
           }
         }
 
-        const holiday = holidays[dateKey];
+        const holiday = holidays[`${m + 1}-${d}`];
         const jntuhVac = checkJntuhVacation(m + 1, d, year);
         const panchang = getTeluguPanchang(year, m, d);
+        const savedNote = localStorage.getItem(dateKey) || "";
 
         let cellClass = "day-cell";
         if (isSunday) cellClass += " sunday";
@@ -429,9 +448,11 @@
             ${descText ? `<div class="event-desc" title="${descText}">${descText}</div>` : ''}
             
             <div class="panchang-box">
-              <div class="panchang-masa">${panchang.masa}</div>
-              <div class="panchang-tithi">${panchang.paksham} ${panchang.tithi}</div>
+              <span class="panchang-masa">${panchang.masa}</span> | 
+              <span class="panchang-tithi">${panchang.paksham} ${panchang.tithi}</span>
             </div>
+
+            <textarea class="day-note" placeholder="Add note..." data-key="${dateKey}">${savedNote}</textarea>
           </div>
         `;
       }
@@ -446,9 +467,16 @@
       </div>`;
 
       container.innerHTML = monthHtml;
+
+      // Attach local storage save listeners
+      document.querySelectorAll(".day-note").forEach(textarea => {
+        textarea.addEventListener("input", (e) => {
+          const key = e.target.getAttribute("data-key");
+          localStorage.setItem(key, e.target.value);
+        });
+      });
     }
 
-    // Set default month to current month
     const today = new Date();
     if (today.getFullYear() === 2026 || today.getFullYear() === 2027) {
       document.getElementById("yearFilter").value = today.getFullYear();
