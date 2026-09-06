@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026 – 2027 Calendar Planner</title>
+  <title>2026 – 2027 Live Shared Calendar Planner</title>
+
+  <!-- Firebase Compat Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     
@@ -21,43 +26,46 @@
     .filter-bar {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       background: #1e293b;
       color: #fff;
       padding: 8px 16px;
       border-radius: 10px;
       margin-bottom: 10px;
       flex-shrink: 0;
+      flex-wrap: wrap;
     }
 
-    .filter-group { display: flex; align-items: center; gap: 8px; }
-    .filter-label { font-size: 0.88rem; font-weight: 700; color: #facc15; }
+    .filter-group { display: flex; align-items: center; gap: 6px; }
+    .filter-label { font-size: 0.85rem; font-weight: 700; color: #facc15; }
     
     select {
-      padding: 5px 12px;
+      padding: 5px 10px;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
       color: #0f172a;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
     }
 
-    /* Auto-Save Indicator Badge */
-    .save-status {
+    /* Live Sync Status Badge */
+    .sync-status {
       margin-left: auto;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       color: #4ade80;
       background: rgba(74, 222, 128, 0.15);
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 3px 10px;
+      border-radius: 6px;
       border: 1px solid rgba(74, 222, 128, 0.3);
-      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* Main Calendar Container with Vertical Scrollbar */
+    /* Main Calendar Container */
     .calendar-container {
       flex-grow: 1;
       display: flex;
@@ -103,7 +111,7 @@
       border-radius: 8px;
     }
 
-    /* Regular Clean Day Box Styling */
+    /* Day Box Styling */
     .day-cell {
       background-color: #ffffff;
       border: 1.5px solid #e2e8f0;
@@ -195,65 +203,29 @@
 
     /* Mobile Layout Adaptation */
     @media (max-width: 768px) {
-      body {
-        padding: 6px;
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
-      }
-
-      .filter-bar {
-        padding: 6px 10px;
-        gap: 8px;
-        justify-content: space-between;
-      }
-
+      body { padding: 6px; height: auto; min-height: 100vh; overflow-y: auto; }
+      .filter-bar { padding: 6px 10px; gap: 8px; }
       .filter-group { gap: 4px; }
-      .filter-label { font-size: 0.8rem; }
-      select { font-size: 0.8rem; padding: 4px 8px; }
-
-      .save-status { font-size: 0.7rem; padding: 2px 5px; }
-
+      .filter-label { font-size: 0.78rem; }
+      select { font-size: 0.78rem; padding: 4px 6px; }
+      .sync-status { font-size: 0.7rem; padding: 2px 6px; margin-left: 0; }
       .month-title { font-size: 1.05rem; }
       .samvatsara-info { font-size: 0.68rem; padding: 2px 6px; }
-
       .calendar-grid { gap: 3px; }
-
-      .day-header {
-        font-size: 0.72rem;
-        padding: 5px 2px;
-        border-radius: 5px;
-      }
-
-      .day-cell {
-        min-height: 85px;
-        padding: 3px 4px;
-        border-radius: 8px;
-      }
-
+      .day-header { font-size: 0.72rem; padding: 5px 2px; border-radius: 5px; }
+      .day-cell { min-height: 85px; padding: 3px 4px; border-radius: 8px; }
       .date-num { font-size: 0.8rem; }
       .moon-symbol { font-size: 0.8rem; }
       .event-desc { font-size: 0.62rem; }
       .panchang-box { font-size: 0.52rem; }
-
-      .day-note {
-        font-size: 0.7rem;
-        padding: 2px 3px;
-        margin-top: 2px;
-      }
-
-      .college-panel {
-        flex-direction: column;
-        gap: 2px;
-        font-size: 0.68rem;
-        padding: 4px 6px;
-      }
+      .day-note { font-size: 0.7rem; padding: 2px 3px; margin-top: 2px; }
+      .college-panel { flex-direction: column; gap: 2px; font-size: 0.68rem; padding: 4px 6px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Controls: Year, Month & Auto-Save Indicator -->
+  <!-- Controls: Year, Month, Live Sync Indicator -->
   <div class="filter-bar">
     <div class="filter-group">
       <span class="filter-label">Year:</span>
@@ -281,31 +253,40 @@
       </select>
     </div>
 
-    <span class="save-status" id="saveIndicator">Auto-Saved ✓</span>
+    <div class="sync-status" id="syncStatus">
+      <span id="syncDot">🟢</span> <span id="syncText">Live Cloud Sync</span>
+    </div>
   </div>
 
   <!-- Scrollable Calendar Grid Container -->
   <div class="calendar-container" id="calendar-output"></div>
 
   <script>
-    const lunarMasas = [
-      "Chaitra", "Vaishakha", "Jyeshtha", "Ashadha", 
-      "Shravana", "Bhadrapada", "Ashvin", "Kartika", 
-      "Margashirsha", "Pushya", "Magha", "Phalguna"
-    ];
+    // ==========================================
+    // REPLACE THIS WITH YOUR FIREBASE CONFIG KEYS
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAK4Y0bH2znow_kTlo_UTv8TTCexsdMgI",
+      authDomain: "onefamilycalendar.firebaseapp.com",
+      databaseURL: "https://onefamilycalendar-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "onefamilycalendar",
+      storageBucket: "onefamilycalendar.firebasestorage.app",
+      messagingSenderId: "763241084224",
+      appId: "1:763241084224:web:badac992417fa0c9a536a5"
+    };
 
-    const tithiNamesShukla = [
-      "Padyami", "Vidiya", "Thadiya", "Chavithi", "Panchami", 
-      "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", 
-      "Ekadashi", "Dwadashi", "Thrayodashi", "Chaturdashi", "Pournami"
-    ];
+    // Initialize Firebase
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+    } catch (e) {
+      console.warn("Firebase config not set yet. Running in offline fallback mode.");
+    }
 
-    const tithiNamesKrishna = [
-      "Padyami", "Vidiya", "Thadiya", "Chavithi", "Panchami", 
-      "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", 
-      "Ekadashi", "Dwadashi", "Thrayodashi", "Chaturdashi", "Amavasya"
-    ];
-
+    const lunarMasas = ["Chaitra", "Vaishakha", "Jyeshtha", "Ashadha", "Shravana", "Bhadrapada", "Ashvin", "Kartika", "Margashirsha", "Pushya", "Magha", "Phalguna"];
+    const tithiNamesShukla = ["Padyami", "Vidiya", "Thadiya", "Chavithi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi", "Thrayodashi", "Chaturdashi", "Pournami"];
+    const tithiNamesKrishna = ["Padyami", "Vidiya", "Thadiya", "Chavithi", "Panchami", "Shashti", "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi", "Thrayodashi", "Chaturdashi", "Amavasya"];
     const weekDaysEn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -330,35 +311,15 @@
     }
 
     const holidaysData2026 = {
-      "1-1": "New Year",
-      "1-13": "Bhogi",
-      "1-14": "Sankranti / Pongal",
-      "1-15": "Kanuma",
-      "1-26": "Republic Day",
-      "2-15": "Maha Shivaratri",
-      "3-3": "Holi",
-      "3-19": "Ugadi",
-      "3-21": "Eid-ul-Fitr (Ramzan)",
-      "3-27": "Sri Rama Navami",
-      "4-3": "Good Friday",
-      "4-14": "Dr. Ambedkar Jayanti",
-      "5-1": "May Day",
-      "5-27": "Bakrid (Eid-ul-Adha)",
-      "6-2": "Telangana Formation Day",
-      "6-25": "Muharram",
-      "7-20": "Bonalu",
-      "8-15": "Independence Day",
-      "8-25": "Milad-un-Nabi",
-      "9-4": "Sri Krishna Janmashtami",
-      "9-14": "Vinayaka Chavithi",
-      "10-2": "Gandhi Jayanti",
-      "10-12": "Bathukamma Vac.",
-      "10-19": "Durgashtami",
-      "10-20": "Vijayadashami / Dasara",
-      "11-8": "Diwali",
-      "11-24": "Kartika Pournami",
-      "12-25": "Christmas"
+      "1-1": "New Year", "1-13": "Bhogi", "1-14": "Sankranti / Pongal", "1-15": "Kanuma", "1-26": "Republic Day",
+      "2-15": "Maha Shivaratri", "3-3": "Holi", "3-19": "Ugadi", "3-21": "Eid-ul-Fitr (Ramzan)", "3-27": "Sri Rama Navami",
+      "4-3": "Good Friday", "4-14": "Dr. Ambedkar Jayanti", "5-1": "May Day", "5-27": "Bakrid (Eid-ul-Adha)", "6-2": "Telangana Formation Day",
+      "6-25": "Muharram", "7-20": "Bonalu", "8-15": "Independence Day", "8-25": "Milad-un-Nabi", "9-4": "Sri Krishna Janmashtami",
+      "9-14": "Vinayaka Chavithi", "10-2": "Gandhi Jayanti", "10-12": "Bathukamma Vac.", "10-19": "Durgashtami", "10-20": "Vijayadashami / Dasara",
+      "11-8": "Diwali", "11-24": "Kartika Pournami", "12-25": "Christmas"
     };
+
+    let activeFirebaseListener = null;
 
     function applyFilters() {
       const year = parseInt(document.getElementById("yearFilter").value);
@@ -409,20 +370,13 @@
 
         const isGreenCell = isSunday || Boolean(holidayName);
         const isToday = (year === 2026 && m === 8 && d === 6);
-
         const panchang = getTeluguPanchang(year, m, d);
-        const savedNote = localStorage.getItem(dateKey) || "";
 
         let moonIcon = "";
-        if (panchang.tithi === "Pournami") {
-          moonIcon = `<span class="moon-symbol" title="Pournami (Full Moon)">🌕</span>`;
-        } else if (panchang.tithi === "Amavasya") {
-          moonIcon = `<span class="moon-symbol" title="Amavasya (New Moon)">🌑</span>`;
-        } else if (panchang.tithi === "Ashtami") {
-          moonIcon = `<span class="moon-symbol" title="Ashtami">🌓</span>`;
-        } else if (panchang.tithi === "Navami") {
-          moonIcon = `<span class="moon-symbol" title="Navami">🌔</span>`;
-        }
+        if (panchang.tithi === "Pournami") moonIcon = `<span class="moon-symbol" title="Pournami">🌕</span>`;
+        else if (panchang.tithi === "Amavasya") moonIcon = `<span class="moon-symbol" title="Amavasya">🌑</span>`;
+        else if (panchang.tithi === "Ashtami") moonIcon = `<span class="moon-symbol" title="Ashtami">🌓</span>`;
+        else if (panchang.tithi === "Navami") moonIcon = `<span class="moon-symbol" title="Navami">🌔</span>`;
 
         let cellClass = "day-cell";
         if (isGreenCell) cellClass += " highlight-green";
@@ -438,13 +392,12 @@
             
             <div class="panchang-box">${panchang.paksham} ${panchang.tithi}</div>
 
-            <textarea class="day-note" placeholder="Note..." data-key="${dateKey}">${savedNote}</textarea>
+            <textarea class="day-note" placeholder="Note..." data-key="${dateKey}"></textarea>
           </div>
         `;
       }
 
       monthHtml += `</div>`;
-
       monthHtml += `
         <div class="college-panel">
           <div><strong>JNTUH Academic Note:</strong> ${m === 0 ? 'Sankranti Break (Jan 12-17)' : m === 4 ? 'Summer Vacation Commences' : m === 9 ? 'Dasara Break (Oct 12-17)' : 'Regular Academic Days'}</div>
@@ -454,21 +407,47 @@
 
       container.innerHTML = monthHtml;
 
-      // Real-time Auto-Save Engine
-      const indicator = document.getElementById("saveIndicator");
+      // Bind Typing Inputs to Firebase + Local Storage Fallback
       document.querySelectorAll(".day-note").forEach(textarea => {
+        const key = textarea.getAttribute("data-key");
+
+        // Load local copy first
+        textarea.value = localStorage.getItem(key) || "";
+
         textarea.addEventListener("input", (e) => {
-          const key = e.target.getAttribute("data-key");
-          localStorage.setItem(key, e.target.value);
-          
-          indicator.textContent = "Saving...";
-          indicator.style.color = "#facc15";
-          
-          setTimeout(() => {
-            indicator.textContent = "Auto-Saved ✓";
-            indicator.style.color = "#4ade80";
-          }, 300);
+          const val = e.target.value;
+          localStorage.setItem(key, val);
+
+          if (db) {
+            db.ref("shared_notes/" + key).set(val);
+          }
         });
+      });
+
+      // Attach Real-time Cloud Listener
+      setupFirebaseRealtimeSync();
+    }
+
+    function setupFirebaseRealtimeSync() {
+      if (!db) return;
+
+      if (activeFirebaseListener) {
+        db.ref("shared_notes").off("value", activeFirebaseListener);
+      }
+
+      activeFirebaseListener = db.ref("shared_notes").on("value", (snapshot) => {
+        const data = snapshot.val() || {};
+        const syncText = document.getElementById("syncText");
+
+        Object.keys(data).forEach(dateKey => {
+          const textarea = document.querySelector(`textarea[data-key="${dateKey}"]`);
+          if (textarea && document.activeElement !== textarea) {
+            textarea.value = data[dateKey];
+            localStorage.setItem(dateKey, data[dateKey]);
+          }
+        });
+
+        if (syncText) syncText.textContent = "Live Cloud Sync Active";
       });
     }
 
