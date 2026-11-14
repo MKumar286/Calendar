@@ -674,7 +674,7 @@ padding: 6px 12px;
     print-color-adjust: exact !important;
   }
 
-  body {
+  html, body {
     background: #ffffff !important;
     color: #000000 !important;
     padding: 0 !important;
@@ -696,6 +696,7 @@ padding: 6px 12px;
   #printSection {
     display: block !important;
     width: 100%;
+    padding: 8mm 10mm;
   }
 
   .print-header {
@@ -728,14 +729,7 @@ padding: 6px 12px;
     font-weight: bold !important;
     color: #000000 !important;
     margin-bottom: 6px !important;
-  }
-
-  .print-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 9px;
-    color: #333;
-    margin-bottom: 6px;
+    text-align: left !important;
   }
 
   #printTable {
@@ -743,7 +737,7 @@ padding: 6px 12px;
     min-width: 100% !important;
     border-collapse: collapse !important;
     border-radius: 0 !important;
-    table-layout: fixed !important;
+    table-layout: auto !important;
   }
 
   #printTable thead {
@@ -760,20 +754,34 @@ padding: 6px 12px;
     color: #ffffff !important;
     border: 1px solid #333333 !important;
     padding: 4px 3px !important;
-    font-size: 9px !important;
-    overflow: hidden;
-    word-wrap: break-word;
+    font-size: 8.5px !important;
     text-shadow: none !important;
     box-shadow: none !important;
   }
 
   #printTable td {
     border: 1px solid #555555 !important;
-    padding: 3px 3px !important;
+    padding: 3px 4px !important;
     font-size: 8.5px !important;
     color: #111111 !important;
-    overflow: hidden;
+  }
+
+  /* Columns up to Pay Package in LPA fit row data cleanly */
+  #printTable th.col-fit, #printTable td.col-fit {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  /* Company Name and Role wrap gracefully while fitting content */
+  #printTable th.col-fit-wrap, #printTable td.col-fit-wrap {
+    white-space: normal;
     word-wrap: break-word;
+  }
+
+  /* Remaining branch columns share identical width */
+  #printTable th.col-branch, #printTable td.col-branch {
+    text-align: center !important;
+    white-space: nowrap;
   }
 
   #printTable th.align-left, #printTable td.align-left {
@@ -792,9 +800,16 @@ padding: 6px 12px;
     background: #ffffff !important;
   }
 
-  #printTable tbody tr:last-child {
+  #printTable tbody tr.total-row {
     background: #d8e5fd !important;
     font-weight: bold !important;
+  }
+
+  #printTable tbody tr.total-row td.total-merged-cell {
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 9.5px !important;
+    letter-spacing: 0.5px;
   }
 
   #printTable .link-btn {
@@ -1007,10 +1022,6 @@ padding: 6px 12px;
     <h3>Training & Placement Cell</h3>
   </div>
   <div class="print-period" id="printPeriodText"></div>
-  <div class="print-meta">
-    <span id="printRecordCount"></span>
-    <span id="printTimestamp"></span>
-  </div>
   <table id="printTable">
     <thead></thead>
     <tbody></tbody>
@@ -1438,7 +1449,8 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
   let paperSize = document.getElementById("paperSizeSelect").value;
   let orientation = document.getElementById("paperOrientationSelect").value;
 
-  document.getElementById("dynamicPageRule").innerHTML = `@page { size: ${paperSize} ${orientation}; margin: 10mm; }`;
+  // margin: 0 removes default browser headers/footers (URL, date/time, page title)
+  document.getElementById("dynamicPageRule").innerHTML = `@page { size: ${paperSize} ${orientation}; margin: 0mm; }`;
 
   let cStartVal = document.getElementById("campusStart").value;
   let cEndVal = document.getElementById("campusEnd").value;
@@ -1446,53 +1458,56 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
     (cStartVal && cEndVal ? `${cStartVal} to ${cEndVal}` : cStartVal ? `from ${cStartVal}` : cEndVal ? `up to ${cEndVal}` : "Overall Academic Period");
   document.getElementById("printPeriodText").innerText = periodText;
 
-  document.getElementById("printRecordCount").innerText = `Total Records: ${filteredData.length} | Columns: ${selectedCols.length}`;
-  document.getElementById("printTimestamp").innerText = `Printed on: ${new Date().toLocaleString()}`;
-
   let pThead = document.querySelector("#printTable thead");
   let pTbody = document.querySelector("#printTable tbody");
   pThead.innerHTML = "";
   pTbody.innerHTML = "";
 
-  // Dynamic width calculation: Company Name and Role get custom adjusted widths, remaining share equal widths
-  let hasComp = selectedCols.some(c => c.toLowerCase().includes("company"));
-  let hasRole = selectedCols.some(c => c.toLowerCase().includes("role"));
-  let numOthers = selectedCols.filter(c => !c.toLowerCase().includes("company") && !c.toLowerCase().includes("role")).length;
+  // Identify boundary column index: "Pay Package in LPA" (or fallback to branch start)
+  let pkgIdx = selectedCols.findIndex(c => {
+    let l = c.toLowerCase().replace(/[\s\.\-_]/g, "");
+    return l.includes("paypackage") || l.includes("package") || l.includes("lpa") || l.includes("ctc");
+  });
 
-  let compWidth = 16;
-  let roleWidth = 15;
+  // If "Pay Package in LPA" isn't selected, fall back to the column right before the first department column
+  if (pkgIdx === -1) {
+    let deptTokens = ["civ", "eee", "mech", "ece", "cse", "it", "csm", "csd", "mct", "csb", "mme", "mtech"];
+    let firstDeptIdx = selectedCols.findIndex(c => deptTokens.includes(c.toLowerCase().replace(/[\s\.\-_]/g, "")));
+    pkgIdx = firstDeptIdx > 0 ? firstDeptIdx - 1 : 0;
+  }
 
-  if (hasComp && !hasRole && numOthers === 0) compWidth = 100;
-  if (!hasComp && hasRole && numOthers === 0) roleWidth = 100;
-  if (hasComp && hasRole && numOthers === 0) { compWidth = 50; roleWidth = 50; }
-
-  let getColWidth = (col) => {
-    let lower = col.toLowerCase();
-    if (lower.includes("company")) return compWidth + "%";
-    if (lower.includes("role")) return roleWidth + "%";
-    let fixedSum = (hasComp ? compWidth : 0) + (hasRole ? roleWidth : 0);
-    let remPct = 100 - fixedSum;
-    return (numOthers > 0 ? (remPct / numOthers).toFixed(2) : (100 / selectedCols.length).toFixed(2)) + "%";
-  };
+  let branchColsCount = selectedCols.length - (pkgIdx + 1);
+  // Allocate equal percentage width across all branch columns after Pay Package in LPA
+  let branchWidthPct = branchColsCount > 0 ? (55 / branchColsCount).toFixed(2) + "%" : "auto";
 
   let headTr = document.createElement("tr");
-  selectedCols.forEach(col => {
+  selectedCols.forEach((col, idx) => {
     let th = document.createElement("th");
     th.innerText = col;
-    th.style.width = getColWidth(col);
     let lowerCol = col.toLowerCase();
-    if (lowerCol.includes("company") || lowerCol.includes("role")) {
-      th.className = "align-left";
+
+    if (idx <= pkgIdx) {
+      if (lowerCol.includes("company") || lowerCol.includes("role")) {
+        th.className = "col-fit-wrap align-left";
+      } else {
+        th.className = "col-fit align-center";
+      }
     } else {
-      th.className = "align-center";
+      th.className = "col-branch align-center";
+      th.style.width = branchWidthPct;
     }
+
     headTr.appendChild(th);
   });
   pThead.appendChild(headTr);
 
-  // Compute sums for numeric/department columns
+  // Compute sums for branch/remaining columns after Pay Package in LPA
   let sums = {};
-  selectedCols.forEach(col => {
+  selectedCols.forEach((col, idx) => {
+    if (idx <= pkgIdx) {
+      sums[col] = null;
+      return;
+    }
     sums[col] = 0;
     let hasNum = false;
     filteredData.forEach(row => {
@@ -1502,47 +1517,51 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
         sums[col] += val;
       }
     });
-    if (!hasNum) sums[col] = null;
+    if (!hasNum) sums[col] = "";
   });
 
   filteredData.forEach(row => {
     let tr = document.createElement("tr");
-    selectedCols.forEach(col => {
+    selectedCols.forEach((col, idx) => {
       let td = document.createElement("td");
-      td.style.width = getColWidth(col);
       let lowerCol = col.toLowerCase();
-      if (lowerCol.includes("company") || lowerCol.includes("role")) {
-        td.className = "align-left";
+
+      if (idx <= pkgIdx) {
+        if (lowerCol.includes("company") || lowerCol.includes("role")) {
+          td.className = "col-fit-wrap align-left";
+        } else {
+          td.className = "col-fit align-center";
+        }
       } else {
-        td.className = "align-center";
+        td.className = "col-branch align-center";
+        td.style.width = branchWidthPct;
       }
+
       renderCellContent(td, col, row[col]);
       tr.appendChild(td);
     });
     pTbody.appendChild(tr);
   });
 
-  // Append Total/Sum row at the end
+  // Append final summary row with merged cells up to Pay Package in LPA
   let sumTr = document.createElement("tr");
-  selectedCols.forEach((col, idx) => {
-    let td = document.createElement("td");
-    td.style.width = getColWidth(col);
-    let lowerCol = col.toLowerCase();
-    if (lowerCol.includes("company") || lowerCol.includes("role")) {
-      td.className = "align-left";
-    } else {
-      td.className = "align-center";
-    }
+  sumTr.className = "total-row";
 
-    if (idx === 0) {
-      td.innerText = "Total / Sum";
-    } else if (sums[col] !== null) {
-      td.innerText = sums[col];
-    } else {
-      td.innerText = "";
-    }
+  let mergedTd = document.createElement("td");
+  mergedTd.colSpan = pkgIdx + 1;
+  mergedTd.className = "total-merged-cell";
+  mergedTd.innerText = "Total";
+  sumTr.appendChild(mergedTd);
+
+  for (let idx = pkgIdx + 1; idx < selectedCols.length; idx++) {
+    let col = selectedCols[idx];
+    let td = document.createElement("td");
+    td.className = "col-branch align-center";
+    td.style.width = branchWidthPct;
+    td.innerText = sums[col] !== null ? sums[col] : "";
     sumTr.appendChild(td);
-  });
+  }
+
   pTbody.appendChild(sumTr);
 
   closePrintModal();
