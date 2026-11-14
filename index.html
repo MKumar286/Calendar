@@ -298,6 +298,11 @@ background: linear-gradient(135deg, #ec008c, #fc6767);
 background: linear-gradient(135deg, #11998e, #38ef7d);
 }
 
+.print-btn {
+background: linear-gradient(135deg, #2193b0, #6dd5ed);
+color: #001d3d;
+}
+
 .control-btn:hover {
 transform: scale(1.04);
 box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
@@ -450,6 +455,152 @@ transform:scale(1.06);
 background:linear-gradient(135deg,#43cea2,#185a9d);
 }
 
+/* PRINT COLUMN SELECTION MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 8, 20, 0.8);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.modal-box {
+  background: linear-gradient(145deg, #001d3d, #0f2027);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-15px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  color: #ffe082;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.modal-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.modal-toolbar select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: #fff;
+  color: #111;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.mini-btn {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mini-btn:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+.columns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  max-height: 270px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 16px;
+}
+
+.col-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.07);
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.2s;
+}
+
+.col-checkbox-item:hover {
+  background: rgba(255,255,255,0.16);
+}
+
+.col-checkbox-item input[type="checkbox"] {
+  accent-color: #00e5ff;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* PRINT AREA CONTAINER (Hidden on screen, visible on print) */
+#printSection {
+  display: none;
+}
+
 /* MOBILE RESPONSIVE MEDIA BLOCK */
 
 @media(max-width:768px){
@@ -516,7 +667,124 @@ padding: 6px 12px;
 
 }
 
+/* DEDICATED SMOOTH PRINT STYLING FOR A4 & LEGAL */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    animation: none !important;
+  }
+
+  body::before,
+  body::after,
+  .header-box,
+  .date-container,
+  .stats-banner,
+  .controls,
+  .table-container,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  #printSection {
+    display: block !important;
+    width: 100%;
+  }
+
+  .print-header {
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #001d3d;
+  }
+
+  .print-header h1 {
+    font-size: 18px !important;
+    background: none !important;
+    -webkit-text-fill-color: #001d3d !important;
+    color: #001d3d !important;
+    margin-bottom: 2px !important;
+  }
+
+  .print-header h3 {
+    font-size: 13px !important;
+    background: none !important;
+    -webkit-text-fill-color: #003566 !important;
+    color: #003566 !important;
+  }
+
+  .print-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  #printTable {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-collapse: collapse !important;
+    border-radius: 0 !important;
+    table-layout: auto;
+  }
+
+  #printTable thead {
+    display: table-header-group;
+  }
+
+  #printTable tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  #printTable th {
+    background: #090e1a !important;
+    color: #ffffff !important;
+    border: 1px solid #333333 !important;
+    padding: 5px 4px !important;
+    font-size: 10px !important;
+    white-space: normal !important;
+    word-wrap: break-word;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  #printTable td {
+    border: 1px solid #555555 !important;
+    padding: 4px 4px !important;
+    font-size: 9.5px !important;
+    color: #111111 !important;
+    white-space: normal !important;
+    word-wrap: break-word;
+  }
+
+  #printTable tbody tr:nth-child(even) {
+    background: #eef5ff !important;
+  }
+
+  #printTable tbody tr:nth-child(odd) {
+    background: #ffffff !important;
+  }
+
+  #printTable .link-btn {
+    background: #667eea !important;
+    color: #ffffff !important;
+    padding: 2px 5px !important;
+    font-size: 8.5px !important;
+    box-shadow: none !important;
+  }
+}
+
 </style>
+<style id="dynamicPageRule"></style>
 
 </head>
 
@@ -652,7 +920,6 @@ padding: 6px 12px;
 <option value="">Total Offers</option>
 </select>
 
-<!-- ADDED: Dedicated Date Sorting Control Dropdown -->
 <select id="sortByFilter">
 <option value="">Sort Dates</option>
 <option value="campusAsc">Campus Date: Old → New</option>
@@ -663,6 +930,7 @@ padding: 6px 12px;
 
 <button type="button" id="resetBtn" class="control-btn reset-btn">Reset Filters</button>
 <button type="button" id="exportBtn" class="control-btn export-btn">Export to Excel</button>
+<button type="button" id="printBtn" class="control-btn print-btn">🖨️ Print</button>
 
 </div>
 
@@ -671,6 +939,58 @@ padding: 6px 12px;
 <thead></thead>
 <tbody></tbody>
 </table>
+</div>
+
+<!-- PRINT COLUMN & PAPER SELECTION MODAL -->
+<div id="printModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Select Columns & Paper Settings to Print</h2>
+      <button type="button" class="close-modal" id="closePrintModal">&times;</button>
+    </div>
+
+    <div class="modal-toolbar">
+      <div class="modal-toolbar-group">
+        <button type="button" class="mini-btn" id="selectAllColsBtn">Select All</button>
+        <button type="button" class="mini-btn" id="deselectAllColsBtn">Deselect All</button>
+      </div>
+      <div class="modal-toolbar-group">
+        <label for="paperSizeSelect">Paper:</label>
+        <select id="paperSizeSelect">
+          <option value="A4">A4</option>
+          <option value="Legal">Legal</option>
+        </select>
+        <label for="paperOrientationSelect">Layout:</label>
+        <select id="paperOrientationSelect">
+          <option value="landscape">Landscape</option>
+          <option value="portrait">Portrait</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="columnCheckboxesContainer" class="columns-grid"></div>
+
+    <div class="modal-footer">
+      <button type="button" class="control-btn reset-btn" id="cancelPrintBtn">Cancel</button>
+      <button type="button" class="control-btn export-btn" id="confirmPrintBtn">🖨️ Print Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEDICATED PRINT LAYOUT CONTAINER -->
+<div id="printSection">
+  <div class="print-header">
+    <h1>MGIT - Campus Placement Report</h1>
+    <h3>Academic Year 2026 - 2027</h3>
+  </div>
+  <div class="print-meta">
+    <span id="printRecordCount"></span>
+    <span id="printTimestamp"></span>
+  </div>
+  <table id="printTable">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
@@ -741,6 +1061,27 @@ alert("CSV Loading Failed. Check Sheet publishing settings.");
 }
 });
 
+/* HELPER TO FORMAT CELL CONTENT IDENTICALLY FOR DISPLAY & PRINT */
+function renderCellContent(td, header, rawValue) {
+  let value = rawValue ? rawValue.toString().trim() : "";
+  if (value.includes("http")) {
+    let a = document.createElement("a");
+    a.href = value;
+    a.target = "_blank";
+    a.className = "link-btn";
+    if (header.toLowerCase().includes("intern")) {
+      a.innerText = "📄 Internship Letter";
+    } else if (header.toLowerCase().includes("offer")) {
+      a.innerText = "📄 Offer Letter";
+    } else {
+      a.innerText = "📄 View";
+    }
+    td.appendChild(a);
+  } else {
+    td.innerText = value;
+  }
+}
+
 /* TABLE DOM INJECTOR GENERATOR WITH DYNAMIC INTERACTIVE HEADER SORTING */
 function buildTable(data){
 let thead=document.querySelector("#placementTable thead");
@@ -796,28 +1137,7 @@ data.forEach(row=>{
 let tr=document.createElement("tr");
 headers.forEach(h=>{
 let td=document.createElement("td");
-let value = row[h] ? row[h].toString().trim() : "";
-
-if(value.includes("http")){
-let a=document.createElement("a");
-a.href=value;
-a.target="_blank";
-a.className="link-btn";
-
-if(h.toLowerCase().includes("intern")){
-a.innerText="📄 Internship Letter";
-}
-else if(h.toLowerCase().includes("offer")){
-a.innerText="📄 Offer Letter";
-}
-else{
-a.innerText="📄 View";
-}
-td.appendChild(a);
-}
-else{
-td.innerText=value;
-}
+renderCellContent(td, h, row[h]);
 tr.appendChild(td);
 });
 tbody.appendChild(tr);
@@ -1032,6 +1352,105 @@ document.getElementById("exportBtn").addEventListener("click", function() {
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);
+});
+
+/* PRINT COLUMN SELECTION & PRINT GENERATOR ENGINE */
+const printModal = document.getElementById("printModal");
+const columnCheckboxesContainer = document.getElementById("columnCheckboxesContainer");
+
+document.getElementById("printBtn").addEventListener("click", function() {
+  if (filteredData.length === 0) {
+    alert("No records found matching current filter scope to print.");
+    return;
+  }
+
+  let headers = Object.keys(filteredData[0]);
+  columnCheckboxesContainer.innerHTML = "";
+
+  headers.forEach((h, idx) => {
+    let label = document.createElement("label");
+    label.className = "col-checkbox-item";
+
+    let cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = h;
+    cb.checked = true;
+    cb.id = "print_col_" + idx;
+
+    let span = document.createElement("span");
+    span.innerText = h;
+
+    label.appendChild(cb);
+    label.appendChild(span);
+    columnCheckboxesContainer.appendChild(label);
+  });
+
+  printModal.style.display = "flex";
+});
+
+function closePrintModal() {
+  printModal.style.display = "none";
+}
+
+document.getElementById("closePrintModal").addEventListener("click", closePrintModal);
+document.getElementById("cancelPrintBtn").addEventListener("click", closePrintModal);
+
+document.getElementById("selectAllColsBtn").addEventListener("click", function() {
+  columnCheckboxesContainer.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = true);
+});
+
+document.getElementById("deselectAllColsBtn").addEventListener("click", function() {
+  columnCheckboxesContainer.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+});
+
+document.getElementById("confirmPrintBtn").addEventListener("click", function() {
+  let selectedCols = Array.from(columnCheckboxesContainer.querySelectorAll("input[type='checkbox']:checked")).map(cb => cb.value);
+
+  if (selectedCols.length === 0) {
+    alert("Please select at least one column to print.");
+    return;
+  }
+
+  let paperSize = document.getElementById("paperSizeSelect").value;
+  let orientation = document.getElementById("paperOrientationSelect").value;
+
+  // Apply dynamic @page size rule for A4 or Legal
+  document.getElementById("dynamicPageRule").innerHTML = `@page { size: ${paperSize} ${orientation}; margin: 10mm; }`;
+
+  // Populate print metadata
+  document.getElementById("printRecordCount").innerText = `Total Records: ${filteredData.length} | Columns: ${selectedCols.length}`;
+  document.getElementById("printTimestamp").innerText = `Printed on: ${new Date().toLocaleString()}`;
+
+  // Build print table with exact original formatting
+  let pThead = document.querySelector("#printTable thead");
+  let pTbody = document.querySelector("#printTable tbody");
+  pThead.innerHTML = "";
+  pTbody.innerHTML = "";
+
+  let headTr = document.createElement("tr");
+  selectedCols.forEach(col => {
+    let th = document.createElement("th");
+    th.innerText = col;
+    headTr.appendChild(th);
+  });
+  pThead.appendChild(headTr);
+
+  filteredData.forEach(row => {
+    let tr = document.createElement("tr");
+    selectedCols.forEach(col => {
+      let td = document.createElement("td");
+      renderCellContent(td, col, row[col]);
+      tr.appendChild(td);
+    });
+    pTbody.appendChild(tr);
+  });
+
+  closePrintModal();
+
+  // Small delay so modal closes cleanly before print dialog opens
+  setTimeout(() => {
+    window.print();
+  }, 150);
 });
 
 </script>
