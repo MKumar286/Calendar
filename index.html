@@ -1440,7 +1440,6 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
 
   document.getElementById("dynamicPageRule").innerHTML = `@page { size: ${paperSize} ${orientation}; margin: 10mm; }`;
 
-  // Period text using campus date range
   let cStartVal = document.getElementById("campusStart").value;
   let cEndVal = document.getElementById("campusEnd").value;
   let periodText = "Following are the placements Details for the period of " + 
@@ -1455,13 +1454,32 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
   pThead.innerHTML = "";
   pTbody.innerHTML = "";
 
-  let colPercentage = (100 / selectedCols.length).toFixed(2) + "%";
+  // Dynamic width calculation: Company Name and Role get custom adjusted widths, remaining share equal widths
+  let hasComp = selectedCols.some(c => c.toLowerCase().includes("company"));
+  let hasRole = selectedCols.some(c => c.toLowerCase().includes("role"));
+  let numOthers = selectedCols.filter(c => !c.toLowerCase().includes("company") && !c.toLowerCase().includes("role")).length;
+
+  let compWidth = 16;
+  let roleWidth = 15;
+
+  if (hasComp && !hasRole && numOthers === 0) compWidth = 100;
+  if (!hasComp && hasRole && numOthers === 0) roleWidth = 100;
+  if (hasComp && hasRole && numOthers === 0) { compWidth = 50; roleWidth = 50; }
+
+  let getColWidth = (col) => {
+    let lower = col.toLowerCase();
+    if (lower.includes("company")) return compWidth + "%";
+    if (lower.includes("role")) return roleWidth + "%";
+    let fixedSum = (hasComp ? compWidth : 0) + (hasRole ? roleWidth : 0);
+    let remPct = 100 - fixedSum;
+    return (numOthers > 0 ? (remPct / numOthers).toFixed(2) : (100 / selectedCols.length).toFixed(2)) + "%";
+  };
 
   let headTr = document.createElement("tr");
   selectedCols.forEach(col => {
     let th = document.createElement("th");
     th.innerText = col;
-    th.style.width = colPercentage;
+    th.style.width = getColWidth(col);
     let lowerCol = col.toLowerCase();
     if (lowerCol.includes("company") || lowerCol.includes("role")) {
       th.className = "align-left";
@@ -1491,7 +1509,7 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
     let tr = document.createElement("tr");
     selectedCols.forEach(col => {
       let td = document.createElement("td");
-      td.style.width = colPercentage;
+      td.style.width = getColWidth(col);
       let lowerCol = col.toLowerCase();
       if (lowerCol.includes("company") || lowerCol.includes("role")) {
         td.className = "align-left";
@@ -1508,7 +1526,7 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
   let sumTr = document.createElement("tr");
   selectedCols.forEach((col, idx) => {
     let td = document.createElement("td");
-    td.style.width = colPercentage;
+    td.style.width = getColWidth(col);
     let lowerCol = col.toLowerCase();
     if (lowerCol.includes("company") || lowerCol.includes("role")) {
       td.className = "align-left";
