@@ -700,32 +700,42 @@ padding: 6px 12px;
 
   .print-header {
     text-align: center;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
     border-bottom: 2px solid #001d3d;
   }
 
   .print-header h1 {
-    font-size: 18px !important;
+    font-size: 16px !important;
     background: none !important;
     -webkit-text-fill-color: #001d3d !important;
     color: #001d3d !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 1px !important;
+    font-weight: bold;
   }
 
   .print-header h3 {
-    font-size: 13px !important;
+    font-size: 12px !important;
     background: none !important;
     -webkit-text-fill-color: #003566 !important;
     color: #003566 !important;
+    margin-top: 0 !important;
+    font-weight: 600;
+  }
+
+  .print-period {
+    font-size: 10px !important;
+    font-weight: bold !important;
+    color: #000000 !important;
+    margin-bottom: 6px !important;
   }
 
   .print-meta {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 9px;
     color: #333;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   #printTable {
@@ -733,7 +743,7 @@ padding: 6px 12px;
     min-width: 100% !important;
     border-collapse: collapse !important;
     border-radius: 0 !important;
-    table-layout: auto;
+    table-layout: fixed !important;
   }
 
   #printTable thead {
@@ -749,9 +759,9 @@ padding: 6px 12px;
     background: #090e1a !important;
     color: #ffffff !important;
     border: 1px solid #333333 !important;
-    padding: 5px 4px !important;
-    font-size: 10px !important;
-    white-space: normal !important;
+    padding: 4px 3px !important;
+    font-size: 9px !important;
+    overflow: hidden;
     word-wrap: break-word;
     text-shadow: none !important;
     box-shadow: none !important;
@@ -759,11 +769,19 @@ padding: 6px 12px;
 
   #printTable td {
     border: 1px solid #555555 !important;
-    padding: 4px 4px !important;
-    font-size: 9.5px !important;
+    padding: 3px 3px !important;
+    font-size: 8.5px !important;
     color: #111111 !important;
-    white-space: normal !important;
+    overflow: hidden;
     word-wrap: break-word;
+  }
+
+  #printTable th.align-left, #printTable td.align-left {
+    text-align: left !important;
+  }
+
+  #printTable th.align-center, #printTable td.align-center {
+    text-align: center !important;
   }
 
   #printTable tbody tr:nth-child(even) {
@@ -774,11 +792,16 @@ padding: 6px 12px;
     background: #ffffff !important;
   }
 
+  #printTable tbody tr:last-child {
+    background: #d8e5fd !important;
+    font-weight: bold !important;
+  }
+
   #printTable .link-btn {
     background: #667eea !important;
     color: #ffffff !important;
-    padding: 2px 5px !important;
-    font-size: 8.5px !important;
+    padding: 2px 4px !important;
+    font-size: 8px !important;
     box-shadow: none !important;
   }
 }
@@ -980,9 +1003,10 @@ padding: 6px 12px;
 <!-- DEDICATED PRINT LAYOUT CONTAINER -->
 <div id="printSection">
   <div class="print-header">
-    <h1>MGIT - Campus Placement Report</h1>
-    <h3>Academic Year 2026 - 2027</h3>
+    <h1>Mahatma Gandhi Institute of Technology (A)</h1>
+    <h3>Training & Placement Cell</h3>
   </div>
+  <div class="print-period" id="printPeriodText"></div>
   <div class="print-meta">
     <span id="printRecordCount"></span>
     <span id="printTimestamp"></span>
@@ -1031,7 +1055,6 @@ return;
 
 let headers = Object.keys(allData[0]);
 
-// Loose contains parsing check loops
 let findKey = (arr, fallback) => headers.find(h => arr.some(term => h.toLowerCase().replace(/[\s\.\-_]/g, "").includes(term))) || fallback;
 
 natureKey = findKey(["natureofthecompany", "naturecompany", "nature"], "");
@@ -1040,7 +1063,6 @@ statusOfDriveKey = findKey(["statusofthedrive", "statusdrive", "statusofdrive"],
 totalKey = headers.find(h => h.toLowerCase().trim() === "total") || "";
 companyNameKey = findKey(["companyname", "companyplaced", "company"], "");
 
-// Strictly matches formatting mutations across sheet labels
 let getDeptKey = (token) => headers.find(h => h.toLowerCase().replace(/[\s\.\-_]/g, "") === token.toLowerCase().replace(/[\s\.\-_]/g, "")) || "";
 Object.keys(deptKeys).forEach(k => {
   let lookup = (k === "mtech") ? "m.tech" : k;
@@ -1052,7 +1074,7 @@ resultDateKey = findKey(["resultdate", "result"], "");
 
 filteredData = [...allData];
 populateFilters(allData);
-applyFilters(); // Trigger filters and dynamic table generation
+applyFilters();
 },
 error:function(err){
 console.log(err);
@@ -1104,7 +1126,6 @@ headers.forEach(h=>{
 let th=document.createElement("th");
 let labelText = h;
 
-// Check if header matches Campus Date or Result Date columns
 if (campusDateKey && h === campusDateKey) {
   th.classList.add("sortable-date-header");
   let sortIndicator = currentSort === "campusAsc" ? " ⬆️ (Old→New)" : currentSort === "campusDesc" ? " ⬇️ (New→Old)" : " ↕️";
@@ -1137,6 +1158,10 @@ data.forEach(row=>{
 let tr=document.createElement("tr");
 headers.forEach(h=>{
 let td=document.createElement("td");
+let lowerH = h.toLowerCase();
+if (lowerH.includes("company") || lowerH.includes("role")) {
+  td.style.textAlign = "left";
+}
 renderCellContent(td, h, row[h]);
 tr.appendChild(td);
 });
@@ -1232,7 +1257,7 @@ function compareDates(aStr, bStr, isAsc = true) {
   let dA = parseCellDate(aStr);
   let dB = parseCellDate(bStr);
   if (!dA && !dB) return 0;
-  if (!dA) return 1;  // Missing/invalid dates pushed to the end
+  if (!dA) return 1;  
   if (!dB) return -1;
   return isAsc ? (dA - dB) : (dB - dA);
 }
@@ -1289,7 +1314,6 @@ return text.includes(search)
 && resultPass;
 });
 
-/* APPLY DATE SORTING ENGINE */
 if (sortBy === "campusAsc" && campusDateKey) {
   filteredData.sort((a, b) => compareDates(a[campusDateKey], b[campusDateKey], true));
 } else if (sortBy === "campusDesc" && campusDateKey) {
@@ -1414,40 +1438,97 @@ document.getElementById("confirmPrintBtn").addEventListener("click", function() 
   let paperSize = document.getElementById("paperSizeSelect").value;
   let orientation = document.getElementById("paperOrientationSelect").value;
 
-  // Apply dynamic @page size rule for A4 or Legal
   document.getElementById("dynamicPageRule").innerHTML = `@page { size: ${paperSize} ${orientation}; margin: 10mm; }`;
 
-  // Populate print metadata
+  // Period text using campus date range
+  let cStartVal = document.getElementById("campusStart").value;
+  let cEndVal = document.getElementById("campusEnd").value;
+  let periodText = "Following are the placements Details for the period of " + 
+    (cStartVal && cEndVal ? `${cStartVal} to ${cEndVal}` : cStartVal ? `from ${cStartVal}` : cEndVal ? `up to ${cEndVal}` : "Overall Academic Period");
+  document.getElementById("printPeriodText").innerText = periodText;
+
   document.getElementById("printRecordCount").innerText = `Total Records: ${filteredData.length} | Columns: ${selectedCols.length}`;
   document.getElementById("printTimestamp").innerText = `Printed on: ${new Date().toLocaleString()}`;
 
-  // Build print table with exact original formatting
   let pThead = document.querySelector("#printTable thead");
   let pTbody = document.querySelector("#printTable tbody");
   pThead.innerHTML = "";
   pTbody.innerHTML = "";
 
+  let colPercentage = (100 / selectedCols.length).toFixed(2) + "%";
+
   let headTr = document.createElement("tr");
   selectedCols.forEach(col => {
     let th = document.createElement("th");
     th.innerText = col;
+    th.style.width = colPercentage;
+    let lowerCol = col.toLowerCase();
+    if (lowerCol.includes("company") || lowerCol.includes("role")) {
+      th.className = "align-left";
+    } else {
+      th.className = "align-center";
+    }
     headTr.appendChild(th);
   });
   pThead.appendChild(headTr);
+
+  // Compute sums for numeric/department columns
+  let sums = {};
+  selectedCols.forEach(col => {
+    sums[col] = 0;
+    let hasNum = false;
+    filteredData.forEach(row => {
+      let val = row[col] ? parseFloat(row[col].toString().trim()) : NaN;
+      if (!isNaN(val)) {
+        hasNum = true;
+        sums[col] += val;
+      }
+    });
+    if (!hasNum) sums[col] = null;
+  });
 
   filteredData.forEach(row => {
     let tr = document.createElement("tr");
     selectedCols.forEach(col => {
       let td = document.createElement("td");
+      td.style.width = colPercentage;
+      let lowerCol = col.toLowerCase();
+      if (lowerCol.includes("company") || lowerCol.includes("role")) {
+        td.className = "align-left";
+      } else {
+        td.className = "align-center";
+      }
       renderCellContent(td, col, row[col]);
       tr.appendChild(td);
     });
     pTbody.appendChild(tr);
   });
 
+  // Append Total/Sum row at the end
+  let sumTr = document.createElement("tr");
+  selectedCols.forEach((col, idx) => {
+    let td = document.createElement("td");
+    td.style.width = colPercentage;
+    let lowerCol = col.toLowerCase();
+    if (lowerCol.includes("company") || lowerCol.includes("role")) {
+      td.className = "align-left";
+    } else {
+      td.className = "align-center";
+    }
+
+    if (idx === 0) {
+      td.innerText = "Total / Sum";
+    } else if (sums[col] !== null) {
+      td.innerText = sums[col];
+    } else {
+      td.innerText = "";
+    }
+    sumTr.appendChild(td);
+  });
+  pTbody.appendChild(sumTr);
+
   closePrintModal();
 
-  // Small delay so modal closes cleanly before print dialog opens
   setTimeout(() => {
     window.print();
   }, 150);
